@@ -1,8 +1,14 @@
-            name: Deploy Hugo site to Pages
+# This is a workflow for building and deploying a Hugo site to GitHub Pages
+
+name: Hugo Build
+
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches:
-      - main
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 permissions:
