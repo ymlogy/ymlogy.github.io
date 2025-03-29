@@ -1,6 +1,6 @@
 ---
 title: "Best Equipment for Staying Warm When Camping in Cold Weather"
-date: 2025-03-30
+date: 2025-03-29
 draft: false
 description: "A guide to the best equipment for staying warm during cold weather camping."
 tags: ["camping", "outdoor", "equipment"]
