@@ -7,6 +7,9 @@ tags: ["camping", "outdoor", "equipment"]
 categories: ["outdoor"]
 ---
 
+![Camping in Cold Weather](https://source.unsplash.com/featured/?camping,cold)
+
+
 ## Introduction
 
 Camping in cold weather can be an exhilarating experience, but it requires the right equipment to ensure you stay warm and comfortable. In this post, we'll explore the best gear to keep you warm when the temperatures drop.
