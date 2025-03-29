@@ -7,7 +7,8 @@ tags: ["camping", "outdoor", "equipment"]
 categories: ["outdoor"]
 ---
 
-![Camping in Cold Weather](https://source.unsplash.com/featured/?camping,cold)
+![Camping in Cold Weather](https://images.unsplash.com/photo-1518434115815-3d4d85e8b1a8)
+
 
 
 ## Introduction
