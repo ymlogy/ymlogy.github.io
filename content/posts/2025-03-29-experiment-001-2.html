@@ -110,6 +110,58 @@ categories: ["general", "hugo", "blogging"]
             100% { transform: scale(0.7) translate(0, 0); opacity: 0.5; }
         }
 
+        .nav-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            backdrop-filter: blur(0);
+        }
+
+        .nav-wrapper.scrolled {
+            background-color: rgba(0, 26, 26, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(32, 178, 170, 0.1);
+        }
+
+        .nav-content {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-title {
+            color: var(--sea-green);
+            font-family: 'Space Mono', monospace;
+            font-size: 1.2rem;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--sea-green);
+            text-decoration: none;
+            font-family: 'Space Mono', monospace;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--ocean-blue);
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -117,6 +169,7 @@ categories: ["general", "hugo", "blogging"]
             min-height: 100vh;
             position: relative;
             z-index: 1;
+            padding-top: calc(2rem + 60px);
         }
 
         header {
@@ -208,6 +261,16 @@ categories: ["general", "hugo", "blogging"]
     </style>
 </head>
 <body>
+    <nav class="nav-wrapper">
+        <div class="nav-content">
+            <a href="/" class="nav-title">Your Blog</a>
+            <div class="nav-links">
+                <a href="/posts" class="nav-link">Posts</a>
+                <a href="/about" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
     <div class="ripple-background">
         <div class="ripple"></div>
         <div class="ripple"></div>
@@ -289,5 +352,25 @@ categories: ["general", "hugo", "blogging"]
             </div>
         </article>
     </div>
+
+    <script>
+        // Add scroll behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            const nav = document.querySelector('.nav-wrapper');
+            let lastScroll = 0;
+            
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                
+                if (currentScroll > 60) {
+                    nav.classList.add('scrolled');
+                } else {
+                    nav.classList.remove('scrolled');
+                }
+                
+                lastScroll = currentScroll;
+            });
+        });
+    </script>
 </body>
 </html>
