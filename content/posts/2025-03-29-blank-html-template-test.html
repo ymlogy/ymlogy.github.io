@@ -1,0 +1,132 @@
+---
+title: "Your Post Title"
+date: 2025-03-21
+categories: ["category1"]
+tags: ["tag1", "tag2"]
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }} | Site Name</title>
+    
+    <!-- Shared Navigation Styles -->
+    <style>
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Navigation Styles */
+        .nav-container {
+            background: #333;
+            padding: 1rem;
+        }
+
+        .main-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            color: white;
+            text-decoration: none;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #4CAF50;
+        }
+
+        /* Mobile Menu */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 1rem;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                background: #333;
+                padding: 1rem;
+                text-align: center;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+        }
+
+        /* Your Custom Content Styles Below */
+        .custom-content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-container">
+        <div class="main-nav">
+            <a href="/" class="nav-logo">Site Logo</a>
+            
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/categories/category1/">Category 1</a></li>
+                <li><a href="/categories/category2/">Category 2</a></li>
+                <li><a href="/categories/category3/">Category 3</a></li>
+                <li><a href="/tags/">All Tags</a></li>
+                <li><a href="/contact/">Contact</a></li>
+            </ul>
+            
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+        </div>
+    </nav>
+
+    <!-- Your Custom Content -->
+    <main class="custom-content">
+        <!-- Add your unique post content here -->
+        {{ .Content | safeHTML }}
+    </main>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
