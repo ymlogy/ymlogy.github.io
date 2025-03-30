@@ -2,99 +2,99 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on ymlogy</title>
-    <link>http://localhost:64991/tags/</link>
+    <link>http://localhost:60038/tags/</link>
     <description>Recent content in Tags on ymlogy</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© 2025 </copyright>
-    <lastBuildDate>Sat, 29 Mar 2025 00:31:15 -0400</lastBuildDate><atom:link href="http://localhost:64991/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 29 Mar 2025 00:31:15 -0400</lastBuildDate><atom:link href="http://localhost:60038/tags/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Sample</title>
-      <link>http://localhost:64991/tags/sample/</link>
+      <link>http://localhost:60038/tags/sample/</link>
       <pubDate>Sat, 29 Mar 2025 00:31:15 -0400</pubDate>
       
-      <guid>http://localhost:64991/tags/sample/</guid>
+      <guid>http://localhost:60038/tags/sample/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Blogging</title>
-      <link>http://localhost:64991/tags/blogging/</link>
+      <link>http://localhost:60038/tags/blogging/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/blogging/</guid>
+      <guid>http://localhost:60038/tags/blogging/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Camping</title>
-      <link>http://localhost:64991/tags/camping/</link>
+      <link>http://localhost:60038/tags/camping/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/camping/</guid>
+      <guid>http://localhost:60038/tags/camping/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Equipment</title>
-      <link>http://localhost:64991/tags/equipment/</link>
+      <link>http://localhost:60038/tags/equipment/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/equipment/</guid>
+      <guid>http://localhost:60038/tags/equipment/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Hugo</title>
-      <link>http://localhost:64991/tags/hugo/</link>
+      <link>http://localhost:60038/tags/hugo/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/hugo/</guid>
+      <guid>http://localhost:60038/tags/hugo/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Modules</title>
-      <link>http://localhost:64991/tags/modules/</link>
+      <link>http://localhost:60038/tags/modules/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/modules/</guid>
+      <guid>http://localhost:60038/tags/modules/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Outdoor</title>
-      <link>http://localhost:64991/tags/outdoor/</link>
+      <link>http://localhost:60038/tags/outdoor/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/outdoor/</guid>
+      <guid>http://localhost:60038/tags/outdoor/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Tag1</title>
-      <link>http://localhost:64991/tags/tag1/</link>
+      <link>http://localhost:60038/tags/tag1/</link>
       <pubDate>Fri, 21 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/tag1/</guid>
+      <guid>http://localhost:60038/tags/tag1/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Tag2</title>
-      <link>http://localhost:64991/tags/tag2/</link>
+      <link>http://localhost:60038/tags/tag2/</link>
       <pubDate>Fri, 21 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/tags/tag2/</guid>
+      <guid>http://localhost:60038/tags/tag2/</guid>
       <description></description>
       
     </item>

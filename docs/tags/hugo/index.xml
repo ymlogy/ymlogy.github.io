@@ -2,29 +2,29 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Hugo on ymlogy</title>
-    <link>http://localhost:64991/tags/hugo/</link>
+    <link>http://localhost:60038/tags/hugo/</link>
     <description>Recent content in Hugo on ymlogy</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© 2025 </copyright>
-    <lastBuildDate>Sat, 29 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:64991/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 29 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:60038/tags/hugo/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>10 Tips for Blogging with Hugo</title>
-      <link>http://localhost:64991/posts/2025-03-29-experiment-001-2/</link>
+      <link>http://localhost:60038/posts/2025-03-29-experiment-001-2/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/posts/2025-03-29-experiment-001-2/</guid>
+      <guid>http://localhost:60038/posts/2025-03-29-experiment-001-2/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Overview of Hugo Modules</title>
-      <link>http://localhost:64991/posts/2025-03-29-hugo-modules/</link>
+      <link>http://localhost:60038/posts/2025-03-29-hugo-modules/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:64991/posts/2025-03-29-hugo-modules/</guid>
+      <guid>http://localhost:60038/posts/2025-03-29-hugo-modules/</guid>
       <description></description>
       
     </item>

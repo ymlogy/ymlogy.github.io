@@ -2,7 +2,7 @@
 title: "10 Tips for Blogging with Hugo"
 date: 2025-03-29
 draft: false
-description: "10 Tips for Blogging with Hugo"
+layout: "raw"
 tags: ["hugo", "blogging"]
 categories: ["general", "hugo", "blogging"]
 ---
@@ -12,7 +12,6 @@ categories: ["general", "hugo", "blogging"]
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>10 Tips for Blogging with Hugo</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&family=Space+Mono&family=VT323&display=swap" rel="stylesheet">
@@ -30,20 +29,33 @@ categories: ["general", "hugo", "blogging"]
             box-sizing: border-box;
         }
 
-        body {
-            background: var(--dark-bg);
-            color: white;
-            font-family: 'Space Grotesk', sans-serif;
+        /* Reset any inherited styles */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg) !important;
+            color: white !important;
+            font-family: 'Space Grotesk', sans-serif !important;
             line-height: 1.6;
             overflow-x: hidden;
+        }
+
+        /* Force our styles over any theme styles */
+        .article-content {
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100vh !important;
         }
 
         .ripple-background {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             z-index: -1;
             background: linear-gradient(45deg, var(--deep-teal), var(--dark-bg));
             overflow: hidden;
@@ -52,25 +64,59 @@ categories: ["general", "hugo", "blogging"]
         .ripple {
             position: absolute;
             border-radius: 50%;
-            background: rgba(32, 178, 170, 0.1);
-            animation: ripple 8s infinite;
             pointer-events: none;
+            mix-blend-mode: screen;
+            filter: blur(5px);
         }
 
-        .ripple:nth-child(1) { top: 20%; left: 30%; width: 300px; height: 300px; animation-delay: 0s; }
-        .ripple:nth-child(2) { top: 50%; left: 70%; width: 400px; height: 400px; animation-delay: 2s; }
-        .ripple:nth-child(3) { top: 70%; left: 20%; width: 200px; height: 200px; animation-delay: 4s; }
+        /* Large ripples with longer animations */
+        .ripple:nth-child(1) { top: 10%; left: 20%; width: 400px; height: 400px; background: rgba(32, 178, 170, 0.2); animation: ripple1 12s infinite; }
+        .ripple:nth-child(2) { top: 40%; left: 60%; width: 500px; height: 500px; background: rgba(30, 144, 255, 0.15); animation: ripple2 15s infinite; }
+        .ripple:nth-child(3) { top: 70%; left: 30%; width: 450px; height: 450px; background: rgba(0, 77, 77, 0.18); animation: ripple3 14s infinite; }
+        
+        /* Medium ripples with medium animations */
+        .ripple:nth-child(4) { top: 25%; left: 75%; width: 300px; height: 300px; background: rgba(32, 178, 170, 0.15); animation: ripple1 10s infinite 1s; }
+        .ripple:nth-child(5) { top: 60%; left: 40%; width: 350px; height: 350px; background: rgba(30, 144, 255, 0.12); animation: ripple2 11s infinite 2s; }
+        .ripple:nth-child(6) { top: 85%; left: 15%; width: 320px; height: 320px; background: rgba(0, 77, 77, 0.15); animation: ripple3 13s infinite 3s; }
+        
+        /* Small ripples with faster animations */
+        .ripple:nth-child(7) { top: 15%; left: 45%; width: 200px; height: 200px; background: rgba(32, 178, 170, 0.2); animation: ripple2 8s infinite 0.5s; }
+        .ripple:nth-child(8) { top: 45%; left: 25%; width: 180px; height: 180px; background: rgba(30, 144, 255, 0.15); animation: ripple3 9s infinite 1.5s; }
+        .ripple:nth-child(9) { top: 75%; left: 65%; width: 220px; height: 220px; background: rgba(0, 77, 77, 0.12); animation: ripple1 7s infinite 2.5s; }
+        .ripple:nth-child(10) { top: 35%; left: 85%; width: 250px; height: 250px; background: rgba(32, 178, 170, 0.18); animation: ripple3 10s infinite 3.5s; }
+        .ripple:nth-child(11) { top: 90%; left: 80%; width: 280px; height: 280px; background: rgba(30, 144, 255, 0.2); animation: ripple1 11s infinite 4.5s; }
+        .ripple:nth-child(12) { top: 5%; left: 5%; width: 230px; height: 230px; background: rgba(0, 77, 77, 0.15); animation: ripple2 12s infinite 5.5s; }
 
-        @keyframes ripple {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            50% { transform: scale(1.2); opacity: 0.3; }
-            100% { transform: scale(0.8); opacity: 0.5; }
+        /* Different animation patterns */
+        @keyframes ripple1 {
+            0% { transform: scale(0.8) translate(0, 0); opacity: 0.5; }
+            25% { transform: scale(1.3) translate(20px, 20px); opacity: 0.3; }
+            50% { transform: scale(1.1) translate(-10px, 30px); opacity: 0.4; }
+            75% { transform: scale(1.2) translate(-20px, -10px); opacity: 0.3; }
+            100% { transform: scale(0.8) translate(0, 0); opacity: 0.5; }
+        }
+
+        @keyframes ripple2 {
+            0% { transform: scale(0.9) translate(0, 0) rotate(0deg); opacity: 0.4; }
+            33% { transform: scale(1.4) translate(15px, -25px) rotate(120deg); opacity: 0.2; }
+            66% { transform: scale(1.2) translate(-25px, 15px) rotate(240deg); opacity: 0.3; }
+            100% { transform: scale(0.9) translate(0, 0) rotate(360deg); opacity: 0.4; }
+        }
+
+        @keyframes ripple3 {
+            0% { transform: scale(0.7) translate(0, 0); opacity: 0.5; }
+            40% { transform: scale(1.3) translate(-30px, 20px); opacity: 0.2; }
+            80% { transform: scale(1.1) translate(30px, -20px); opacity: 0.4; }
+            100% { transform: scale(0.7) translate(0, 0); opacity: 0.5; }
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
         }
 
         header {
@@ -166,13 +212,18 @@ categories: ["general", "hugo", "blogging"]
         <div class="ripple"></div>
         <div class="ripple"></div>
         <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
     </div>
 
     <div class="container">
-        <header>
-            <h1>10 Tips for Blogging with Hugo</h1>
-            <div class="meta">Posted on March 29, 2025 • 5 min read</div>
-        </header>
 
         <article>
             <h2>Master the Art of Hugo Blogging</h2>
