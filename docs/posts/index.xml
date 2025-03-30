@@ -2,59 +2,69 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on ymlogy</title>
-    <link>http://localhost:1313/posts/</link>
+    <link>http://localhost:64991/posts/</link>
     <description>Recent content in Posts on ymlogy</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© 2025 </copyright>
-    <lastBuildDate>Sat, 29 Mar 2025 00:31:15 -0400</lastBuildDate><atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 29 Mar 2025 00:31:15 -0400</lastBuildDate><atom:link href="http://localhost:64991/posts/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Lorem Ipsum Sample Post</title>
-      <link>http://localhost:1313/posts/2025-03-29-lorem-ipsum/</link>
+      <link>http://localhost:64991/posts/2025-03-29-lorem-ipsum/</link>
       <pubDate>Sat, 29 Mar 2025 00:31:15 -0400</pubDate>
       
-      <guid>http://localhost:1313/posts/2025-03-29-lorem-ipsum/</guid>
+      <guid>http://localhost:64991/posts/2025-03-29-lorem-ipsum/</guid>
+      <description></description>
+      
+    </item>
+    
+    <item>
+      <title>10 Tips for Blogging with Hugo</title>
+      <link>http://localhost:64991/posts/2025-03-29-experiment-001-2/</link>
+      <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:64991/posts/2025-03-29-experiment-001-2/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Best Equipment for Staying Warm When Camping in Cold Weather</title>
-      <link>http://localhost:1313/posts/2025-03-30-best-equipment-for-camping-in-cold-weather/</link>
+      <link>http://localhost:64991/posts/2025-03-30-best-equipment-for-camping-in-cold-weather/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2025-03-30-best-equipment-for-camping-in-cold-weather/</guid>
+      <guid>http://localhost:64991/posts/2025-03-30-best-equipment-for-camping-in-cold-weather/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Lorem Ipsum Sample Post 2</title>
-      <link>http://localhost:1313/posts/2025-03-30-lorem-2/</link>
+      <link>http://localhost:64991/posts/2025-03-30-lorem-2/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2025-03-30-lorem-2/</guid>
+      <guid>http://localhost:64991/posts/2025-03-30-lorem-2/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Overview of Hugo Modules</title>
-      <link>http://localhost:1313/posts/2025-03-29-hugo-modules/</link>
+      <link>http://localhost:64991/posts/2025-03-29-hugo-modules/</link>
       <pubDate>Sat, 29 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2025-03-29-hugo-modules/</guid>
+      <guid>http://localhost:64991/posts/2025-03-29-hugo-modules/</guid>
       <description></description>
       
     </item>
     
     <item>
       <title>Your Post Title</title>
-      <link>http://localhost:1313/posts/2025-03-29-blank-html-template-test/</link>
+      <link>http://localhost:64991/posts/2025-03-29-blank-html-template-test/</link>
       <pubDate>Fri, 21 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2025-03-29-blank-html-template-test/</guid>
+      <guid>http://localhost:64991/posts/2025-03-29-blank-html-template-test/</guid>
       <description></description>
       
     </item>

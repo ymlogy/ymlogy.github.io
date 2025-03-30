@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tag2 on ymlogy</title>
-    <link>http://localhost:1313/tags/tag2/</link>
+    <link>http://localhost:64991/tags/tag2/</link>
     <description>Recent content in Tag2 on ymlogy</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>© 2025 </copyright>
-    <lastBuildDate>Fri, 21 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/tag2/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 21 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:64991/tags/tag2/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Your Post Title</title>
-      <link>http://localhost:1313/posts/2025-03-29-blank-html-template-test/</link>
+      <link>http://localhost:64991/posts/2025-03-29-blank-html-template-test/</link>
       <pubDate>Fri, 21 Mar 2025 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/posts/2025-03-29-blank-html-template-test/</guid>
+      <guid>http://localhost:64991/posts/2025-03-29-blank-html-template-test/</guid>
       <description></description>
       
     </item>
