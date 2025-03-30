@@ -1,3 +1,12 @@
+---
+title: "Overview of Hugo Modules"
+date: 2025-03-29
+draft: false
+description: "An overview of Hugo Modules"
+tags: ["hugo", "modules"]
+categories: ["general", "hugo", "modules"]
+---
+
 ### **Overview of Hugo Modules**
 
 Hugo Modules are a powerful feature introduced in Hugo (starting from version 0.56) that allows you to manage dependencies, share reusable components, and extend functionality in your Hugo projects. They are designed to make it easier to integrate external resources (like themes, assets, or data) and modularize your Hugo site for scalability and maintainability.
