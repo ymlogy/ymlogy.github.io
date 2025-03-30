@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Category1 on ymlogy</title>
+    <link>http://localhost:1313/categories/category1/</link>
+    <description>Recent content in Category1 on ymlogy</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>© 2025 </copyright>
+    <lastBuildDate>Fri, 21 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/categories/category1/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Your Post Title</title>
+      <link>http://localhost:1313/posts/2025-03-29-blank-html-template-test/</link>
+      <pubDate>Fri, 21 Mar 2025 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/posts/2025-03-29-blank-html-template-test/</guid>
+      <description></description>
+      
+    </item>
+    
+  </channel>
+</rss>
