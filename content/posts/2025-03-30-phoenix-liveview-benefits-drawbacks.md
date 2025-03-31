@@ -137,3 +137,4 @@ The decision to use Phoenix LiveView should ultimately be based on a careful eva
 
 [^25]: https://testdouble.com/insights/phoenix-liveview-without-javascript
 
+the end
