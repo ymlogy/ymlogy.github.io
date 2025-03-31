@@ -123,7 +123,3 @@ A Chrome extension designed for personal use to help efficiently manage and cura
 
 ---
 
-This spec provides a clear foundation for development while prioritizing compliance and user experience. Let me know if you’d like to refine any section! 🚀
-
----
-Answer from Perplexity: pplx.ai/share
