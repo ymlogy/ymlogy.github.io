@@ -254,10 +254,16 @@ categories: ["general", "hugo", "blogging"]
         }
 
         @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            article { padding: 2rem; }
+            .container { padding: .5rem; }
+            article { padding: 1rem; }
             .tip-number { font-size: 6rem; }
+            .tip p {
+            font-size: 1rem;
+            line-height: 1.5;
         }
+        }
+
+        
     </style>
 </head>
 <body>
@@ -354,20 +360,21 @@ categories: ["general", "hugo", "blogging"]
     </div>
 
     <script>
-        // Add scroll behavior
         document.addEventListener('DOMContentLoaded', function() {
             const nav = document.querySelector('.nav-wrapper');
             let lastScroll = 0;
-            
+    
             window.addEventListener('scroll', () => {
                 const currentScroll = window.pageYOffset;
-                
-                if (currentScroll > 60) {
-                    nav.classList.add('scrolled');
+    
+                if (currentScroll > lastScroll && currentScroll > 60) {
+                    // User is scrolling down, hide the nav
+                    nav.style.transform = 'translateY(-100%)';
                 } else {
-                    nav.classList.remove('scrolled');
+                    // User is scrolling up, show the nav
+                    nav.style.transform = 'translateY(0)';
                 }
-                
+    
                 lastScroll = currentScroll;
             });
         });
