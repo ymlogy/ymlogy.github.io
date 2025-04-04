@@ -24,6 +24,16 @@ To get the RSS feed of a YouTube playlist, follow these steps:
 
 4. **Note**: YouTube limits the RSS feed to the latest 15 videos. If you encounter issues or if the feed doesn't work as expected, consider using third-party tools like RSS.app to generate the feed[4][8].
 
+5. **Generating RSS Feed for a YouTube Channel**:
+   - Getting a channel's RSS feed is trickier than playlists because you need the channel ID rather than the visible @channel-name
+   - The channel ID is typically hidden in the page's source code
+   - As an easier alternative, you can use Pesky Moe's tool which extracts the correct feed URL:
+     ```
+     https://ytrss.pesky.moe
+     ```
+   - Simply paste your channel URL and it will generate the proper RSS feed URL
+
+
 Alternatively, you can use third-party services like RSS.app to create RSS feeds from YouTube playlists by simply copying and pasting the YouTube URL into their tool[4][8].
 
 Citations:
