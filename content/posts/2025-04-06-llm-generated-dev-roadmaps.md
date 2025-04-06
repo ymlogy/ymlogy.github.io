@@ -1,3 +1,12 @@
+---
+title: "Development Roadmaps by 5 LLMs"
+date: 2025-04-06
+draft: false
+description: "Includes suggested prompts"
+tags: ["LLM, prompting, Yttango, development"]
+categories: ["development", "python", "LLMs"]
+---
+
 I asked Claude, Gemini, ChatGPT, Copilot and Perplexity the following prompt:
 
 I am building an app that assesses and manages youtube videos and interfaces with youtube api and google gemini 2.0 api to produce transcript summaries. The first stage of the app building process has already been completed:
