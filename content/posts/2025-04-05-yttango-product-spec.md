@@ -34,11 +34,12 @@ Yttango is a web application designed for personal use to efficiently assess and
     *   Display of channel thumbnail, name, most recent video date, number of unprocessed videos (up to 15, highlighted if >0), and a short channel description.
     *   Display of playlist thumbnail (or placeholder), name, assigned subject area, most recent video date, number of unprocessed videos (up to 15, highlighted if >0), playlist creator, and an editable playlist description.
     *   'Sync' button for both channels and playlists to pull in the latest 15 videos (or any new videos) into the main video list.
-8.  **Database Management:** Local storage of all data in a **Postgres database**. Functionality to delete individual video entries or purge the entire database.
+8.  **Database Management:** Local storage of all data in a **Postgres database**. Functionality to delete individual video entries or select entries to delete from the entire database.
 9.  **Manual Video Addition:** Option for users to manually add individual video URLs to the database.
 10. **Error Handling and Logging:** Basic error handling and event logging.
 11. **Dark Mode UI:** CSS styling implemented in a dark mode theme.
 12. **API Key Security:** Utilisation of a **Flask proxy server** to securely manage YouTube Data API v3 and Gemini API keys.
+13. **Synchronize Feeds Button:** Before any API calls are made to the Youtube Data v3 API, and the Gemini 2.0 API, the user clicks a 'synchronize feeds' button that pulls in the most recent videos from the youtube video feeds that the user has added to the app. The feeds are the xml rss feeds from the channels and playlists that the user has previously added and are listed in the channels and playlists sections at the top of the UI grid. The feeds list key metadata of the last 15 videos in the feed. When the user clicks the 'synchronize feeds' the app only adds videos to the grid ui that have not already been added. Videos remain in the grid ui until they are either deleted or added to the postgres rag database.
 
 ### **3. Detailed Functional Requirements**
 
