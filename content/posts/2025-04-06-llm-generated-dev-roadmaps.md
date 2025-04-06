@@ -16,7 +16,7 @@ A Flask app. User inputs a youtube video URL and the app uses the youtube-transc
 Refer to the product spec attached and lay out the development stages in a natural and rational order. Each stage should add key functional aspects and build on the foundations of existing codebase. Each stage should be enough to provide a prompt to the LLM coding assistant - a sensible amount of work. For each stage include a suggested prompt for the LLM coding assistant, that provides sufficient detail and specificity in order to maximise the chances of successful code generation.
 
 
-# Claude 3.7 Sonnet
+# Claude
 
 Based on the Yttango product specification, I'll organize a logical development roadmap that builds on your existing Flask app foundation. Each stage will include a detailed prompt for an LLM coding assistant to help maximize successful code generation.
 
@@ -353,7 +353,7 @@ Each of these stages builds logically on the previous work, delivers a tangible 
 
 
 
-# Gemini 2.0
+# Gemini
 
 Okay, let's break down the development of the Yttango app into logical stages with LLM prompts. I'll focus on building incrementally, referencing the product spec, and providing detailed prompts.
 
