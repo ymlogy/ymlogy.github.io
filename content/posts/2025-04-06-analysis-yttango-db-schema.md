@@ -16,7 +16,7 @@ The schema includes tables for `videos`, `channels`, `playlists`, `subjects`, an
 * **Relational Structure:** The schema is well-structured, using primary and foreign keys to establish relationships between entities. This is crucial for data integrity and efficient querying.
 * **Data Type Choices:** The data types seem appropriate for the data being stored (e.g., `TEXT` for descriptions and transcripts, `TIMESTAMP` for dates, `VARCHAR` for bounded strings).
 * **Subject Area Categorization:** The `subjects` table and its relationships with `videos`, `channels`, and `playlists` enable flexible categorization of content.
-* **Many-to-Many for Videos and Playlists:** The `video_playlist_association` table correctly handles the many-to-many relationship between videos and playlists (though the spec indicates this might be a future feature)[cite: 162, 163, 164, 165, 166, 167].
+* **Many-to-Many for Videos and Playlists:** The `video_playlist_association` table correctly handles the many-to-many relationship between videos and playlists (though the spec indicates this might be a future feature).
 
 **Potential Problems and Considerations**
 
