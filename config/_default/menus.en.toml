@@ -40,7 +40,17 @@
 #  name = "My Awesome Category"
 #  pre = "github"
 #  pageRef = "categories/awesome"
-#  weight = 20
+#  weight = 21
+
+[[main]]
+  name = "About"
+  pageRef = "about"
+  weight = 5
+
+[[main]]
+  name = "Categories"
+  pageRef = "categories"
+  weight = 15
 
 #[[main]]
 #  name = "Categories"
