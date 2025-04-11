@@ -7,11 +7,13 @@ tags: ["AI", "startups", "podcast"]
 categories: ["technology", "business"]
 ---
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/OV_mDp1s9mY?feature=shared" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+  <iframe src="https://www.youtube.com/embed/OV_mDp1s9mY?feature=shared" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+</div>
 
 ## Briefing Document: The AI Gold Rush
 
-**Date:** 16 May 2024  
+**Date:** April 2025  
 **Subject:** Analysis of "The AI Gold Rush Has Officially Started" Podcast Excerpts  
 **Source:** Startup Ideas Podcast featuring Greg Isenberg and Riley Brown  
 
