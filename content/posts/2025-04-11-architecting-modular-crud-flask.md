@@ -15,7 +15,7 @@ Before diving into the architecture recommendations, it's important to understan
 
 ## Core Architectural Principles for Flask Applications
 
-The structure you initially proposed shows good intuition but can be refined with some architectural principles. Let's examine the core principles that should guide your Flask application architecture:
+Let's examine the core principles that should guide your Flask application architecture:
 
 ### Separation of Concerns
 
