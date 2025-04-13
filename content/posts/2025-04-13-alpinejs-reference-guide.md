@@ -11,8 +11,6 @@ Below is a comprehensive reference guide for Alpine.js—a lightweight, declarat
 
 ---
 
-# Alpine.js Comprehensive Reference Guide
-
 ## 1. Introduction
 
 Alpine.js is designed to be a minimal, yet powerful tool that lets you add JavaScript behavior to your markup without a heavy framework. It uses custom HTML attributes to bind data, handle events, apply conditionals, iterate over lists, and much more. Think of it as a sprinkle of Vue-like reactivity on top of your HTML—perfect for small projects, adding interactivity, or progressive enhancement.
