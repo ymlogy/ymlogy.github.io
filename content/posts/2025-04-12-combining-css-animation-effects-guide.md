@@ -1,5 +1,5 @@
 ---
-title: "Combining CSS Animation Effects: A Comprehensive Guide"
+title: "Prompting CSS Animation Effects and Combos"
 date: 2025-04-12
 draft: false
 description: "prompting CSS animation"
