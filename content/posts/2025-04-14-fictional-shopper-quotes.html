@@ -12,10 +12,15 @@ categories: ["creative writing", "humor"]
 <head>
     <style>
         .underwater-container {
-            position: relative;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
             overflow: hidden;
             background: linear-gradient(180deg, #006994, #003366);
-            padding: 2rem;
+            padding: 0 2rem 2rem 2rem;
             color: rgba(255, 255, 255, 0.9);
         }
 
@@ -30,6 +35,7 @@ categories: ["creative writing", "humor"]
             border-radius: 50%;
             pointer-events: none;
             animation: rise 8s infinite;
+            bottom: 0;
         }
 
         @keyframes float {
@@ -58,11 +64,50 @@ categories: ["creative writing", "humor"]
             margin: 1.5em 0;
             padding: 1em;
             transition: all 0.3s ease;
+            filter: none;
         }
 
         blockquote:hover {
             filter: url(#ripple);
             transform: scale(1.02);
+        }
+
+        .ripple-animate {
+            animation: ripple-cycle .2s linear 49;
+            filter: url(#ripple);
+        }
+
+        .float-animate {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        blockquote.ripple-animate.float-animate {
+            animation: ripple-cycle .2s linear 49, float 5s ease-in-out infinite;
+            filter: url(#ripple);
+        }
+
+        @keyframes ripple-cycle {
+            0% {
+                filter: none;
+            }
+            10% {
+                filter: url(#ripple);
+            }
+            90% {
+                filter: url(#ripple);
+            }
+            100% {
+                filter: none;
+            }
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 2rem 2rem 4rem 2rem;
+            color: #fff;
         }
     </style>
 </head>
@@ -76,13 +121,14 @@ categories: ["creative writing", "humor"]
             </filter>
             
             <filter id="ripple">
-                <feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="3" result="noise" />
-                <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" />
+                <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="7" />
             </filter>
         </defs>
     </svg>
 
-    <div class="underwater-container">
+    <div class="underwater-container"></div>
+    <div class="content">
         <article>
             <header>
                 <h1 class="underwater-text">Fictional Shopper Quotes About Weird Products</h1>
@@ -160,6 +206,21 @@ categories: ["creative writing", "humor"]
             }
         }
         createBubbles();
+
+        // Ripple and float animation for blockquotes on hover
+        document.addEventListener('DOMContentLoaded', function() {
+            const blockquotes = document.querySelectorAll('blockquote');
+            blockquotes.forEach((bq) => {
+                bq.addEventListener('mouseenter', () => {
+                    if (!bq.classList.contains('ripple-animate')) {
+                        bq.classList.add('ripple-animate');
+                    }
+                    if (!bq.classList.contains('float-animate')) {
+                        bq.classList.add('float-animate');
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
