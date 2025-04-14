@@ -87,4 +87,4 @@ Once you have the encoded SVG, embed it in your HTML file using a `<link>` tag w
 
 By embedding an SVG favicon directly in your HTML, you can streamline your website's assets and improve performance. This technique is especially useful for modern, lightweight web applications.
 
-Happy coding!
+Happy coding
