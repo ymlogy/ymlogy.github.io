@@ -109,6 +109,35 @@ categories: ["creative writing", "humor"]
             padding: 2rem 2rem 4rem 2rem;
             color: #fff;
         }
+
+        .kelp-layer {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .kelp-strand {
+            stroke-linecap: round;
+            filter: blur(0.5px);
+            opacity: 0.7;
+            transform-origin: bottom center;
+            animation: kelp-sway 7s ease-in-out infinite alternate;
+        }
+
+        .kelp-strand:nth-child(2) { animation-delay: 2s; animation-duration: 8s; }
+        .kelp-strand:nth-child(3) { animation-delay: 1s; animation-duration: 6s; }
+        .kelp-strand:nth-child(4) { animation-delay: 3s; animation-duration: 9s; }
+        .kelp-strand:nth-child(5) { animation-delay: 1.5s; animation-duration: 7s; }
+
+        @keyframes kelp-sway {
+            0% { transform: rotate(-2deg) scaleY(1); }
+            50% { transform: rotate(2deg) scaleY(1.03); }
+            100% { transform: rotate(-2deg) scaleY(1); }
+        }
     </style>
 </head>
 <body>
@@ -128,6 +157,15 @@ categories: ["creative writing", "humor"]
     </svg>
 
     <div class="underwater-container"></div>
+    <div class="kelp-layer">
+        <svg id="kelp-svg" width="100vw" height="100vh" viewBox="0 0 1000 1000" preserveAspectRatio="none" style="display:block; width:100vw; height:100vh;">
+            <path class="kelp-strand" d="M100,1000 Q120,800 110,600 Q90,400 100,200 Q110,100 100,0" stroke="#4db36d" stroke-width="16" fill="none" />
+            <path class="kelp-strand" d="M300,1000 Q320,850 310,650 Q290,450 300,250 Q310,150 300,0" stroke="#5ec47e" stroke-width="14" fill="none" />
+            <path class="kelp-strand" d="M500,1000 Q520,820 510,600 Q490,380 500,180 Q510,90 500,0" stroke="#3c8c4b" stroke-width="18" fill="none" />
+            <path class="kelp-strand" d="M700,1000 Q720,870 710,670 Q690,470 700,270 Q710,170 700,0" stroke="#61b87b" stroke-width="15" fill="none" />
+            <path class="kelp-strand" d="M900,1000 Q920,800 910,600 Q890,400 900,200 Q910,100 900,0" stroke="#2e6b3a" stroke-width="13" fill="none" />
+        </svg>
+    </div>
     <div class="content">
         <article>
             <header>
@@ -210,17 +248,38 @@ categories: ["creative writing", "humor"]
         // Ripple and float animation for blockquotes on hover
         document.addEventListener('DOMContentLoaded', function() {
             const blockquotes = document.querySelectorAll('blockquote');
+            function triggerAnimations(bq) {
+                if (!bq.classList.contains('ripple-animate')) {
+                    bq.classList.add('ripple-animate');
+                }
+                if (!bq.classList.contains('float-animate')) {
+                    bq.classList.add('float-animate');
+                }
+            }
             blockquotes.forEach((bq) => {
-                bq.addEventListener('mouseenter', () => {
-                    if (!bq.classList.contains('ripple-animate')) {
-                        bq.classList.add('ripple-animate');
-                    }
-                    if (!bq.classList.contains('float-animate')) {
-                        bq.classList.add('float-animate');
-                    }
-                });
+                // Desktop hover
+                bq.addEventListener('mouseenter', () => triggerAnimations(bq));
+                // Mobile tap/touch
+                bq.addEventListener('touchstart', () => triggerAnimations(bq));
+                bq.addEventListener('click', () => triggerAnimations(bq));
             });
         });
+
+        // Parallax kelp effect
+        function updateKelpParallax() {
+            const kelp = document.getElementById('kelp-svg');
+            const scrollTop = window.scrollY || window.pageYOffset;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = docHeight > 0 ? scrollTop / docHeight : 0;
+            // Map scrollPercent from 0 (25% height) to 1 (80% height)
+            const min = 0.25, max = 0.8;
+            const kelpHeight = min + (max - min) * scrollPercent;
+            kelp.style.transform = `scaleY(${kelpHeight})`;
+            kelp.style.transformOrigin = 'bottom';
+        }
+        window.addEventListener('scroll', updateKelpParallax);
+        window.addEventListener('resize', updateKelpParallax);
+        document.addEventListener('DOMContentLoaded', updateKelpParallax);
     </script>
 </body>
 </html>
