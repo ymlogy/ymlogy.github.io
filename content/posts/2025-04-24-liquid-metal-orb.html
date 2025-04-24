@@ -30,9 +30,59 @@ categories: ["development", "3d", "webgl", "experiments"]
             border-radius: 5px;
         }
     </style>
-</head>
-<body>
+</head>---
+title: "Liquid Metal Orb"
+date: 2025-04-24
+draft: false
+description: "Interactive 3D liquid metal orb using Three.js"
+tags: ["threejs", "webgl", "interactive"]
+categories: ["web development"]
+---
+
+<div class="threejs-container">
     <div class="info">Liquid Metal Orb</div>
+    
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"
+        }
+      }
+    </script>
+    
+    <script type="module">
+        // Your Three.js code here (keep all the existing JS)
+    </script>
+</div>
+
+<style>
+.threejs-container {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    margin: 2rem 0;
+}
+
+.threejs-container .info {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    color: white;
+    font-family: monospace;
+    background-color: rgba(0,0,0,0.7);
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 10;
+}
+
+.threejs-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+</style>
+<body>
     
     <!-- Import Three.js using ES modules -->
     <script type="importmap">
