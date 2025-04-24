@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js InstancedMesh Dynamic Pattern</title>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #111; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.163.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import Stats from 'three/addons/libs/stats.module.js';
+
+        let scene, camera, renderer, stats;
+        let instancedMesh, material;
+        const clock = new THREE.Clock();
+
+        // Configuration
+        const instanceCount = 20000; // Number of instances (>= 10,000)
+        const distributionRadius = 50; // How far the instances spread out
+
+        // --- Shader Code ---
+
+        // Vertex Shader: Handles displacement using instance ID, time, and a random factor
+        const vertexShader = /* glsl */`
+            #version 300 es
+
+            precision highp float;
+
+            // Uniforms supplied by JavaScript
+            uniform float uTime;
+            uniform mat4 modelViewMatrix;   // Three.js provides these
+            uniform mat4 projectionMatrix; // Three.js provides these
+
+            // Input vertex attributes (from base geometry)
+            in vec3 position;
+            in vec3 normal; // Needed for displacement direction
+
+            // Input instance attributes
+            in mat4 instanceMatrix; // Transformation matrix for this instance
+            in float aRandom;       // Custom random attribute per instance
+
+            // Output to Fragment Shader
+            out float vNoiseFactor;
+            out float vRandom;
+
+            // Simple pseudo-random function (not true noise, but effective)
+            float pseudoRandom(float seed) {
+                return fract(sin(seed * 12.9898) * 43758.5453);
+            }
+
+            // Basic noise-like function using sine waves
+            float simpleNoise(vec3 pos, float timeOffset, float instanceFactor) {
+                // Combine position, time, and instance uniqueness for variation
+                float noise = sin(pos.x * 0.5 + timeOffset * 0.5 + instanceFactor * 0.1) * 0.3 +
+                              cos(pos.y * 0.8 + timeOffset * 0.3 + instanceFactor * 0.2) * 0.4 +
+                              sin(pos.z * 0.6 + timeOffset * 0.4 + instanceFactor * 0.3) * 0.3;
+                return noise * 0.5 + 0.5; // Normalize roughly to 0-1 range
+            }
+
+            void main() {
+                // Calculate a displacement factor based on vertex position, time, and instance randomness
+                // We use a combination of the pseudoRandom seed (aRandom) and gl_InstanceID for variation
+                float instanceUniqueness = aRandom * 10.0 + float(gl_InstanceID) * 0.001;
+                float noise = simpleNoise(position, uTime, instanceUniqueness);
+
+                // Apply displacement along the normal - more subtle effect
+                // The amount of displacement also varies per instance based on aRandom
+                float displacementScale = 0.5 + aRandom * 1.5; // Vary displacement strength
+                vec3 displacedPosition = position + normal * noise * displacementScale;
+
+                // Calculate final world position for this instance's vertex
+                vec4 worldPosition = instanceMatrix * vec4(displacedPosition, 1.0);
+
+                // Calculate screen position
+                gl_Position = projectionMatrix * modelViewMatrix * worldPosition;
+
+                // Pass data to fragment shader
+                vNoiseFactor = noise; // Pass the calculated noise value
+                vRandom = aRandom;    // Pass the instance's random seed
+            }
+        `;
+
+        // Fragment Shader: Determines color based on noise and random factor
+        const fragmentShader = /* glsl */`
+            #version 300 es
+
+            precision highp float;
+
+            // Input from Vertex Shader
+            in float vNoiseFactor;
+            in float vRandom;
+
+            // Output color
+            out vec4 fragColor;
+
+            void main() {
+                // Define two colors for the gradient
+                vec3 colorA = vec3(0.1, 0.3, 0.9); // Deep Blue
+                vec3 colorB = vec3(0.8, 0.2, 0.5); // Magenta/Pink
+
+                // Create a mix factor based on the noise and the instance's random value
+                // This ensures instances have slightly different base colors and vary with the noise/displacement
+                float mixFactor = smoothstep(0.0, 1.0, vNoiseFactor * 0.6 + vRandom * 0.4);
+
+                // Mix the colors
+                vec3 finalColor = mix(colorA, colorB, mixFactor);
+
+                // Add a subtle brightness variation based on randomness
+                finalColor *= (0.8 + vRandom * 0.4);
+
+                // Final color output
+                fragColor = vec4(finalColor, 1.0); // Fully opaque
+            }
+        `;
+
+        // --- Initialization ---
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x111111); // Dark background
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 70; // Move camera back to see the pattern
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            // Stats.js (FPS Counter)
+            stats = new Stats();
+            document.body.appendChild(stats.dom);
+
+            // Controls
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // Smooth camera movement
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 10;
+            controls.maxDistance = 200;
+
+            // --- InstancedMesh Setup ---
+
+            // 1. Base Geometry (using BufferGeometry)
+            // Using a BoxGeometry for simplicity
+            const baseGeometry = new THREE.BoxGeometry(1.5, 1.5, 1.5); // Small cube
+
+            // 2. Custom Shader Material
+            material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0.0 } // Time uniform for animation
+                },
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                // side: THREE.DoubleSide // uncomment if back faces should be visible/colored
+            });
+
+            // 3. InstancedMesh
+            instancedMesh = new THREE.InstancedMesh(baseGeometry, material, instanceCount);
+            instancedMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage); // Important for potential updates, though we set initially
+
+            // 4. Set Instance Transformations and Attributes
+
+            // Create a dummy Object3D to help with matrix calculations
+            const dummy = new THREE.Object3D();
+            const randomValues = new Float32Array(instanceCount); // For storing per-instance random seeds
+
+            for (let i = 0; i < instanceCount; i++) {
+                // Position: Distribute instances within a spherical volume
+                const phi = Math.acos(-1 + (2 * i) / instanceCount); // Distribute evenly over sphere surface (fibonacci lattice-like)
+                const theta = Math.sqrt(instanceCount * Math.PI) * phi;
+                const radius = distributionRadius * Math.cbrt(Math.random()); // Distribute within the sphere volume
+
+                dummy.position.setFromSphericalCoords(radius, phi, theta);
+
+                // Rotation: Random rotation for each instance
+                dummy.rotation.set(
+                    Math.random() * 2 * Math.PI,
+                    Math.random() * 2 * Math.PI,
+                    Math.random() * 2 * Math.PI
+                );
+
+                // Scale: Slightly random scale
+                const scale = 0.5 + Math.random() * 1.0;
+                dummy.scale.set(scale, scale, scale);
+
+                // Update the dummy's matrix
+                dummy.updateMatrix();
+
+                // Apply the matrix to the instance
+                instancedMesh.setMatrixAt(i, dummy.matrix);
+
+                // Store a random value for this instance
+                randomValues[i] = Math.random(); // Value between 0.0 and 1.0
+            }
+
+            // Add the custom 'aRandom' attribute to the geometry
+            // This attribute provides a unique random seed to the shader for each instance
+            instancedMesh.geometry.setAttribute('aRandom', new THREE.InstancedBufferAttribute(randomValues, 1));
+
+            // Crucial: Tell Three.js that the instance matrices need to be uploaded to the GPU
+            instancedMesh.instanceMatrix.needsUpdate = true;
+
+            // Add the InstancedMesh to the scene
+            scene.add(instancedMesh);
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        // --- Animation Loop ---
+        function animate() {
+            // Request the next frame
+            renderer.setAnimationLoop(animate); // Use WebGLRenderer's loop for VR compatibility
+
+            stats.begin(); // Start FPS monitoring
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // Update the time uniform in the shader material
+            material.uniforms.uTime.value = elapsedTime;
+
+            // Optional: Gentle automated rotation if OrbitControls are not used/moved
+            // instancedMesh.rotation.x = elapsedTime * 0.05;
+            // instancedMesh.rotation.y = elapsedTime * 0.08;
+
+            // Update OrbitControls if they are used
+            // controls.update(); // Required if enableDamping is true
+
+            // Render the scene
+            renderer.render(scene, camera);
+
+            stats.end(); // End FPS monitoring
+        }
+
+        // --- Event Listener ---
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // --- Start the application ---
+        init();
+        animate();
+
+    </script>
+</body>
+</html>
