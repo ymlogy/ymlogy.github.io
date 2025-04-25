@@ -1,5 +1,34 @@
 rules:
+  html_fullscreen_posts:
+    description: "Full-viewport background HTML posts"
+    match_front_matter:
+      full_screen: true
+    requirements:
+      - must_include_front_matter: true
+        fields:
+          - title
+          - date
+          - draft
+          - description
+          - tags
+          - categories
+          - full_screen
+      - html_structure:
+          - allow_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
+          - global_body_styles: true
+          - preserve_hugo_layout: false
+      - script_handling:
+          - external_scripts_last: true
+          - module_scripts: true
+      - responsive_design:
+          - full_viewport: true
+    best_practices:
+      - keep_js_minimal: true
+      - maintain_hugo_seo: true
+      - preserve_theme_colors: false
   html_blog_posts:
+    match_front_matter:
+      full_screen: false
     description: "Rules for HTML format blog posts in Hugo"
     requirements:
       - must_include_front_matter: true
@@ -12,6 +41,7 @@ rules:
           - categories
       - html_structure:
           - no_global_body_styles: true
+          - forbid_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
           - container_class: "threejs-container" # or similar semantic name
           - scoped_styles: true
           - preserve_hugo_layout: true
@@ -19,7 +49,6 @@ rules:
           - external_scripts_last: true
           - module_scripts: true
       - responsive_design:
-          - viewport_meta: true
           - relative_units: true
           - mobile_friendly: true
     best_practices:
