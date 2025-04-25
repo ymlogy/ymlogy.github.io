@@ -76,7 +76,7 @@ full_screen: true
             document.querySelector('.threejs-container').appendChild(renderer.domElement);
             
             // Add orbit controls for interactivity
-            controls = new OrbitControls(camera, renderer.domElement);
+            controls = new OrbitControls(camera, document.body);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
             
