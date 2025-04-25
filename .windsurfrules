@@ -1,95 +1,63 @@
 rules:
-  html_fullscreen_posts:
-    description: "Full-viewport background HTML posts"
+  html_custom_false:
+    description: "Standard Hugo posts (no custom HTML)"
     match_front_matter:
-      full_screen: true
-    requirements:
-      - must_include_front_matter: true
-        fields:
-          - title
-          - date
-          - draft
-          - description
-          - tags
-          - categories
-          - full_screen
-      - html_structure:
-          - allow_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
-          - global_body_styles: true
-          - preserve_hugo_layout: false
-      - script_handling:
-          - external_scripts_last: true
-          - module_scripts: true
-      - responsive_design:
-          - full_viewport: true
+      custom_html: false
     best_practices:
-      - keep_js_minimal: true
-      - maintain_hugo_seo: true
-      - preserve_theme_colors: false
-  html_blog_posts:
+      - standard_hugo_markdown: true
+
+  html_custom_normal:
+    description: "Normal HTML posts (CSS & JS overrides without 3D)"
     match_front_matter:
-      full_screen: false
-    description: "Rules for HTML format blog posts in Hugo"
+      custom_html: normal
     requirements:
-      - must_include_front_matter: true
-        fields:
-          - title
-          - date
-          - draft
-          - description
-          - tags
-          - categories
       - html_structure:
-          - no_global_body_styles: true
-          - forbid_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
-          - container_class: "threejs-container" # or similar semantic name
-          - scoped_styles: true
-          - preserve_hugo_layout: true
+          forbid_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
+          scoped_styles: true
+          preserve_hugo_layout: true
       - script_handling:
-          - external_scripts_last: true
-          - module_scripts: true
+          allow_module_scripts: true
+
+  html_custom_embed:
+    description: "Inline Three.js embed posts"
+    match_front_matter:
+      custom_html: embed
+    requirements:
+      - html_structure:
+          container_class: "threejs-container"
+          scoped_styles: true
+          preserve_hugo_layout: true
+      - script_handling:
+          external_scripts_last: true
+          module_scripts: true
+
+  html_custom_fullscreen:
+    description: "Full-screen Three.js background posts (no controls)"
+    match_front_matter:
+      custom_html: full-screen
+    requirements:
+      - html_structure:
+          forbid_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
+          global_body_styles: true
+          preserve_hugo_layout: false
+      - script_handling:
+          external_scripts_last: true
+          module_scripts: true
       - responsive_design:
-          - relative_units: true
-          - mobile_friendly: true
-    best_practices:
-      - keep_js_minimal: true
-      - use_scoped_selectors: true
-      - maintain_hugo_seo: true
-      - preserve_theme_colors: true
-    examples:
-      good: |
-        ---
-        title: "Interactive Demo"
-        date: 2025-01-01
-        draft: false
-        description: "An interactive web component"
-        tags: ["web", "interactive"]
-        categories: ["demos"]
-        ---
-        
-        <div class="demo-container">
-          <!-- Content here -->
-        </div>
-        
-        <style>
-        .demo-container {
-          /* Scoped styles */
-        }
-        </style>
-        
-        <script type="module">
-          // Scoped JavaScript
-        </script>
-      bad: |
-        <html>
-        <head>
-          <title>Bad Example</title>
-          <style>
-          body { /* Global overrides */ }
-          </style>
-        </head>
-        <body>
-          <!-- No front matter -->
-          <!-- Global style overrides -->
-        </body>
-        </html>
+          full_viewport: true
+
+  html_custom_controls:
+    description: "Full-screen Three.js background posts with OrbitControls"
+    match_front_matter:
+      custom_html: controls
+    requirements:
+      - html_structure:
+          forbid_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
+          global_body_styles: true
+          preserve_hugo_layout: false
+      - script_handling:
+          external_scripts_last: true
+          module_scripts: true
+          require_orbitcontrols: true
+      - responsive_design:
+          full_viewport: true

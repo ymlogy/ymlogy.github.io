@@ -283,32 +283,30 @@ full_screen: true
 
 <section class="windsurfrules-recap">
   <h2>Using .windsurfrules</h2>
-  <p>Our <code>.windsurfrules</code> file now defines two rule sets to guide HTML-post handling:</p>
-  <h3>1. html_fullscreen_posts</h3>
+  <p>Front matter now uses <code>custom_html</code> with five modes:</p>
+  <h3>1. False (default)</h3>
   <ul>
-    <li>Triggered by <code>full_screen: true</code> in front matter</li>
-    <li>Allows full-document tags (<code>&lt;!DOCTYPE&gt;</code>, <code>&lt;html&gt;</code>, <code>&lt;head&gt;</code>, <code>&lt;body&gt;</code>)</li>
-    <li>Enables global body styles and a full-viewport background</li>
-    <li>Overrides Hugo’s layout (<code>preserve_hugo_layout: false</code>)</li>
-    <li>Ideal for immersive, background-like demos</li>
+    <li>Standard Hugo Markdown post—no custom HTML/CSS/JS enhancements.</li>
   </ul>
-  <h3>2. html_blog_posts</h3>
+  <h3>2. Normal</h3>
   <ul>
-    <li>Default when <code>full_screen: false</code> or omitted</li>
-    <li>Forbids top-level tags to preserve theme structure</li>
-    <li>Requires scoped CSS inside a container (<code>.threejs-container</code>)</li>
-    <li>Keeps Hugo’s header/footer and responsive design</li>
-    <li>Best for small interactive embeds within articles</li>
+    <li>Scoped HTML/CSS/JS overrides (no 3D). No top-level tags; theme layout preserved.</li>
   </ul>
-  <h3>How to write custom HTML posts</h3>
+  <h3>3. Embed</h3>
   <ul>
-    <li>Set <code>full_screen</code> in your front matter (<code>true</code> or <code>false</code>).</li>
-    <li>Write your HTML according to the matched rule:
-      <ul>
-        <li>Full-screen: include top-level tags and global styles.</li>
-        <li>Inline: wrap content in a <code>&lt;div class="threejs-container"&gt;</code> and use scoped selectors.</li>
-      </ul>
-    </li>
-    <li>Place <code>&lt;script type="module"&gt;</code> blocks at the bottom of your content.</li>
+    <li>Inline Three.js embed inside a container (e.g. <code>.threejs-container</code>); theme layout preserved.</li>
+  </ul>
+  <h3>4. Full-screen</h3>
+  <ul>
+    <li>Three.js scene as full-window background, no OrbitControls; skips theme wrapper.</li>
+  </ul>
+  <h3>5. Controls</h3>
+  <ul>
+    <li>Full-screen Three.js background with OrbitControls enabled; skips theme wrapper and may disable page scroll.</li>
+  </ul>
+  <h3>How to use</h3>
+  <ul>
+    <li>Set <code>custom_html: [false|normal|embed|full-screen|controls]</code> in your front matter.</li>
+    <li>Follow the corresponding rules in <code>.windsurfrules</code> for structure, scripts, and responsiveness.</li>
   </ul>
 </section>
