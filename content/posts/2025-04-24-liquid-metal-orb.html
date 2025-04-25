@@ -79,6 +79,7 @@ full_screen: true
             controls = new OrbitControls(camera, document.body);
             controls.enableDamping = true;
             controls.dampingFactor = 0.05;
+            controls.enableZoom = false; // disable scroll wheel zoom so page scroll works
             
             // Add a single static light for efficiency
             const light = new THREE.DirectionalLight(0xffffff, 1);
