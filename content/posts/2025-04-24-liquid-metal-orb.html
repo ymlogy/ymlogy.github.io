@@ -77,9 +77,12 @@ full_screen: true
             
             // Add orbit controls for interactivity
             controls = new OrbitControls(camera, document.body);
-            controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.enableZoom = false; // disable scroll wheel zoom so page scroll works
+            // On mobile: one-finger swipe scrolls the page, two-finger rotates the orb
+            controls.touches.ONE = THREE.TOUCH.PAN;
+            controls.touches.TWO = THREE.TOUCH.ROTATE;
+            controls.enablePan = false;
+            controls.enableZoom = false;
             
             // Add a single static light for efficiency
             const light = new THREE.DirectionalLight(0xffffff, 1);
