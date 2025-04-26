@@ -50,7 +50,7 @@ custom_html: full-screen
     const renderer = new THREE.WebGLRenderer({ antialias: !isMobile });
     renderer.setSize(window.innerWidth, window.innerHeight);
     
-    // Set appropriate pixel ratio based on device
+    // Set different renderer parameters based on device
     if (isMobile) {
       // Lower resolution on mobile (0.6 of pixel ratio) for better performance
       renderer.setPixelRatio(Math.min(window.devicePixelRatio * 0.6, 1.0));
@@ -130,7 +130,13 @@ custom_html: full-screen
         
         // Use limited iterations to maintain performance
         // Complexity parameter controls number of octaves used
+        // Adaptive complexity based on device capabilities
         int effectiveOctaves = octaves;
+        
+        // Fast return for first octave on mobile
+        if (effectiveOctaves == 1) {
+          return snoise(p);
+        }
         
         for (int i = 0; i < 4; i++) {
           if (i >= effectiveOctaves) break;
@@ -165,6 +171,10 @@ custom_html: full-screen
       uniform float noiseStrength;
       uniform int complexity;
       uniform float aspectRatio;
+      uniform vec3 color1;
+      uniform vec3 color2;
+      uniform vec3 color3;
+      uniform vec3 color4;
       uniform bool isMobile;
       
       varying vec2 vUv;
@@ -219,12 +229,6 @@ custom_html: full-screen
         pattern = pattern * 0.5 + 0.5;
         pattern = pattern + sin(distance(p, vec2(0.0)) * 4.0 + time * 0.3) * 0.1;
         
-        // Define four dark and moody colors
-        vec3 color1 = vec3(0.05, 0.03, 0.15);  // Deep midnight blue
-        vec3 color2 = vec3(0.12, 0.05, 0.2);   // Dark purple
-        vec3 color3 = vec3(0.03, 0.1, 0.15);   // Dark teal
-        vec3 color4 = vec3(0.15, 0.08, 0.05);  // Dark rust
-        
         // Blend between colors based on the pattern
         // Adding time creates a cycling effect in the color selection
         float colorMix = mod(pattern + time * 0.1, 1.0);
@@ -248,10 +252,14 @@ custom_html: full-screen
       noiseStrength: { value: 1.0 },
       complexity: { value: isMobile ? 1 : 2 }, // Lower default complexity on mobile
       aspectRatio: { value: window.innerWidth / window.innerHeight },
+      color1: { value: new THREE.Color(0.05, 0.03, 0.15) },  // Deep midnight blue
+      color2: { value: new THREE.Color(0.12, 0.05, 0.2) },   // Dark purple
+      color3: { value: new THREE.Color(0.03, 0.1, 0.15) },   // Dark teal
+      color4: { value: new THREE.Color(0.15, 0.08, 0.05) },  // Dark rust
       isMobile: { value: isMobile }
     };
 
-    // Create material with the custom shaders
+    // Create shader material
     const material = new THREE.ShaderMaterial({
       uniforms: uniforms,
       vertexShader: vertexShader,
@@ -262,24 +270,93 @@ custom_html: full-screen
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // Handle window resize
-    window.addEventListener('resize', () => {
+    // Track animation frame for cancellation
+    let animationFrameId = null;
+
+    // Track page visibility
+    let isPageVisible = document.visibilityState === 'visible';
+
+    // Handle visibility changes - use named function for later removal
+    function handleVisibilityChange() {
+      isPageVisible = document.visibilityState === 'visible';
+      
+      if (isPageVisible && !animationFrameId) {
+        // Resume animation if page becomes visible again
+        animationFrameId = requestAnimationFrame(animate);
+      }
+    }
+
+    // Add visibility event listener
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Handle window resize - use named function for later removal
+    function handleResize() {
       renderer.setSize(window.innerWidth, window.innerHeight);
       uniforms.aspectRatio.value = window.innerWidth / window.innerHeight;
-    });
+    }
+
+    // Add resize listener
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup function to prevent memory leaks
+    function cleanup() {
+      // Cancel any pending animation frames
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      
+      // Remove event listeners
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      // Remove DOM elements
+      const container = document.querySelector('.threejs-container');
+      if (container && renderer.domElement) {
+        container.removeChild(renderer.domElement);
+      }
+      
+      // Dispose of Three.js resources
+      if (geometry) geometry.dispose();
+      if (material) material.dispose();
+      if (renderer) renderer.dispose();
+      
+      console.log('Three.js resources cleaned up');
+    }
+
+    // Add cleanup on page unload
+    window.addEventListener('beforeunload', cleanup);
 
     // Animation loop
     const clock = new THREE.Clock();
     let animationSpeed = 0.5;
     
-    function animate() {
-      requestAnimationFrame(animate);
-      uniforms.time.value += clock.getDelta() * animationSpeed;
-      renderer.render(scene, camera);
+    // Adaptive frame rate for mobile
+    let lastFrameTime = 0;
+    const mobileFrameInterval = 1000 / 30; // 30fps for mobile
+
+    function animate(currentTime) {
+      if (isPageVisible) {
+        animationFrameId = requestAnimationFrame(animate);
+        
+        // On mobile, limit to 30fps
+        if (isMobile) {
+          if (currentTime && lastFrameTime && (currentTime - lastFrameTime < mobileFrameInterval)) {
+            return; // Skip this frame
+          }
+          lastFrameTime = currentTime;
+        }
+        
+        uniforms.time.value += clock.getDelta() * animationSpeed;
+        renderer.render(scene, camera);
+      } else {
+        // When page is hidden, don't request animation frames
+        animationFrameId = null;
+      }
     }
-    
+
     // Start the animation
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
 
     // Add controls for adjusting parameters
     document.getElementById('speed').addEventListener('input', function(e) {
