@@ -13,5 +13,7 @@ Thumbs.db
 # Hugo generated resources
 resources/_gen/
 .hugo_build.lock
-content/posts/2025-04-25-animated-moody-gradient-pattern.html.bak
 content/html-tests/
+
+# B
+*.bak

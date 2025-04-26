@@ -28,13 +28,6 @@ custom_html: full-screen
       height: 100%;
     }
     .content-container {
-      position: relative;
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 30px;
-      color: #fff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
       background: rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -345,7 +338,7 @@ custom_html: full-screen
         name: 'vignette',
         uniforms: {
           tDiffuse: { value: null },
-          darkness: { value: 0.3 },
+          darkness: { value: 0.05 },
           offset: { value: 0.9 },
           resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
         },
@@ -373,10 +366,10 @@ custom_html: full-screen
             uv.x = (uv.x - 0.5) * aspect + 0.5;
             
             float dist = distance(uv, center);
-            color.rgb *= smoothstep(1.0, offset, dist);
+            color.rgb *= mix(0.8, 1.0, smoothstep(1.0, offset, dist));
             
             // Apply subtle darkening
-            color.rgb = mix(color.rgb, color.rgb * (1.0 - darkness), smoothstep(0.0, offset, dist));
+            color.rgb = mix(color.rgb, color.rgb * (1.0 - darkness), smoothstep(0.0, offset, dist) * 0.5);
             
             gl_FragColor = color;
           }
