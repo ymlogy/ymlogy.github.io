@@ -15,5 +15,5 @@ resources/_gen/
 .hugo_build.lock
 content/html-tests/
 
-# B
+# Backup files
 *.bak
