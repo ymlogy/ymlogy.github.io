@@ -297,7 +297,7 @@ custom_html: full-screen
           
           // Vignette effect
           float vignette = 1.0 - smoothstep(0.4, 1.2, length(p * 1.8));
-          finalColor *= mix(0.6, 1.0, vignette);
+          finalColor *= mix(0.8, 1.0, vignette);
           
           gl_FragColor = vec4(finalColor, 1.0);
         }
@@ -367,9 +367,6 @@ custom_html: full-screen
             
             float dist = distance(uv, center);
             color.rgb *= mix(0.8, 1.0, smoothstep(1.0, offset, dist));
-            
-            // Apply subtle darkening
-            color.rgb = mix(color.rgb, color.rgb * (1.0 - darkness), smoothstep(0.0, offset, dist) * 0.5);
             
             gl_FragColor = color;
           }
