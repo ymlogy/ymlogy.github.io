@@ -155,10 +155,10 @@ custom_html: full-screen
       const textureUniforms = {
         time: { value: 0 },
         resolution: { value: new THREE.Vector2(config.textureSize, config.textureSize) },
-        color1: { value: new THREE.Vector3(0.05, 0.03, 0.15) }, // Dark purple
-        color2: { value: new THREE.Vector3(0.12, 0.05, 0.2) },  // Purple
-        color3: { value: new THREE.Vector3(0.03, 0.1, 0.15) },  // Teal
-        color4: { value: new THREE.Vector3(0.15, 0.08, 0.05) }  // Rust
+        color1: { value: new THREE.Vector3(0.1, 0.07, 0.2) }, // Dark purple
+        color2: { value: new THREE.Vector3(0.2, 0.09, 0.3) },  // Purple
+        color3: { value: new THREE.Vector3(0.06, 0.15, 0.2) },  // Teal
+        color4: { value: new THREE.Vector3(0.2, 0.15, 0.09) }  // Rust
       };
       
       const textureVertexShader = `
@@ -449,8 +449,6 @@ custom_html: full-screen
 </div>
 
 <section class="content-container">
-  <h1>Performant Three.js Animated Textures</h1>
-  
   <p>Creating beautiful animated backgrounds with WebGL and Three.js can be visually stunning, but often comes with significant performance challenges, especially on mobile devices. In this article, we'll explore how to create high-performance animated gradient textures that maintain consistent frame rates without degradation over time.</p>
   
   <h2>The Performance Problem</h2>
