@@ -32,9 +32,7 @@ custom_html: full-screen
     background: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    padding: 2rem;
-    margin: 5vh auto;
-    max-width: 800px;
+    
     position: relative;
     z-index: 1;
   }
@@ -53,15 +51,6 @@ custom_html: full-screen
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false });
     renderer.setClearColor(BG_COLOR, 1);
     renderer.setPixelRatio(window.devicePixelRatio);
-
-    // Make renderer/canvas larger than viewport for overscan effect
-    function resizeRenderer() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      renderer.setSize(w * 1.4, h * 1.4, false);
-    }
-    resizeRenderer();
-    window.addEventListener('resize', resizeRenderer);
 
     // Scene and camera
     const scene = new THREE.Scene();
@@ -84,14 +73,14 @@ custom_html: full-screen
       precision mediump float;
       varying vec2 vUv;
       uniform float u_time;
+      uniform float u_aspect;
       uniform vec3 u_bgColor;
       uniform vec3 u_mazeColor;
       
       void main() {
         // Centered coordinates
         vec2 uv = vUv * 2.0 - 1.0;
-        float aspect = float(${window.innerWidth}.0) / float(${window.innerHeight}.0);
-        uv.x *= aspect;
+        uv.x *= u_aspect;
 
         // Polar coordinates
         float r = length(uv);
@@ -127,6 +116,7 @@ custom_html: full-screen
     const material = new THREE.ShaderMaterial({
       uniforms: {
         u_time: { value: 0 },
+        u_aspect: { value: window.innerWidth / window.innerHeight },
         u_bgColor: { value: BG_COLOR },
         u_mazeColor: { value: MAZE_COLOR }
       },
@@ -137,6 +127,20 @@ custom_html: full-screen
     // Mesh for fullscreen quad
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
+    
+    // Make renderer/canvas larger than viewport for overscan effect
+    function resizeRenderer() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      renderer.setSize(w * 1.4, h * 1.4, false);
+      
+      // Update aspect ratio uniform
+      material.uniforms.u_aspect.value = w / h;
+    }
+    
+    // Initial setup and event listener
+    resizeRenderer();
+    window.addEventListener('resize', resizeRenderer);
 
     // Animation loop with efficient uniform update
     let animationId;
@@ -168,7 +172,7 @@ custom_html: full-screen
 
 <p>Generation Z spans individuals born between 1997 and 2012, making them 13 to 28 years old in 2025<sup>[6][7]</sup>. This generational boundary reflects their formative experiences: growing up amid rapid technological advancements, economic instability, and global crises like the COVID-19 pandemic<sup>[2]</sup>. In the U.S., Gen Z is the most racially diverse generation, with 50.9% identifying as non-Hispanic white, 25% Hispanic, 13.8% Black, and 5.3% Asian<sup>[6]</sup>. Nearly 29% are immigrants or children of immigrants, fostering a globalized worldview that prioritizes inclusivity<sup>[6]</sup>.</p>
 
-<h3>Economic Realities</h3>bg-c
+<h3>Economic Realities</h3>
 
 <p>Financial pragmatism defines Gen Z’s approach to consumption. Having witnessed the 2008 financial crisis and the inflationary pressures of the 2020s, 43% plan to reduce non-essential spending, while 51% prioritize financial security<sup>[2]</sup>. This thriftiness coexists with digital savviness; 98% use social media for product research, and they are twice as likely as older cohorts to adopt mobile payment systems<sup>[2][3]</sup>. Their dual identity as cost-conscious yet tech-dependent consumers creates unique challenges for brands balancing affordability with innovation.</p>
 
@@ -178,7 +182,7 @@ custom_html: full-screen
 
 <h3>Authenticity and Transparency</h3>
 
-<p>Gen Z demands genuine connections with brands, rejecting polished corporate narratives in favor of raw, relatable storytelling. A 2024 study found that 34% will boycott companies failing to address social or environmental issues<sup>[2]</sup>. Successful campaigns, such as Rare Beauty’s mental health advocacy or Patagonia’s environmental activism, embed their missions into every touchpoint, from supply chain transparency to influencer partnerships<sup>[4]</sup>. As one Gen Z consumer explains, “We crave transparency-not just in ingredients, but in intentions”<sup>[4]</sup>.</p>
+<p>Gen Z demands genuine connections with brands, rejecting polished corporate narratives in favor of raw, relatable storytelling. A 2024 study found that 34% will boycott companies failing to address social or environmental issues<sup>[2]</sup>. Successful campaigns, such as Rare Beauty’s mental health advocacy or Patagonia’s environmental activism, embed their missions into every touchpoint, from supply chain transparency to influencer partnerships<sup>[4]</sup>. As one Gen Z consumer explains, “We crave transparency—not just in ingredients, but in intentions”<sup>[4]</sup>.</p>
 
 <h3>Diversity, Equity, and Inclusion (DEI)</h3>
 
