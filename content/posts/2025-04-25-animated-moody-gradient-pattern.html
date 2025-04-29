@@ -8,8 +8,7 @@ categories: ["experiments", "webgl"]
 custom_html: full-screen
 ---
 
-<div class="threejs-container">
-  <style scoped>
+  <style>
     .threejs-container {
       position: fixed;
       top: 0;
@@ -27,8 +26,55 @@ custom_html: full-screen
       width: 100%;
       height: 100%;
     }
-  </style>
+  
+    .content-container {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
 
+  .prompt-box, .result-box {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid rgba(100, 100, 255, 0.5);
+  }
+  
+  .prompt-box {
+    border-left-color: rgba(100, 100, 255, 0.5);
+  }
+  
+  .result-box {
+    border-left-color: rgba(100, 255, 100, 0.5);
+  }
+  
+  .prompt-and-result h2 {
+    margin-top: 40px;
+  }
+  
+  .prompt-and-result h3 {
+    margin-top: 25px;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .prompt-and-result h4 {
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .prompt-and-result ul {
+    margin-left: 20px;
+  }
+  
+  .prompt-and-result li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  
+</style>
+
+<div class="threejs-container">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script>
     // Show controls when pressing 'c'
@@ -403,7 +449,7 @@ custom_html: full-screen
   </div>
 </div>
 
-<section class="gradient-info">
+<section class="content-container">
   <h2>About This Animation</h2>
   <p>This page demonstrates an animated gradient background created with Three.js and GLSL shaders. The animation uses layered noise patterns to create a dynamic, moody atmosphere.</p>
 
@@ -417,9 +463,7 @@ custom_html: full-screen
   </ul>
 
   <p>Press <code>c</code> to toggle the animation controls and adjust parameters.</p>
-</section>
 
-<section class="prompt-and-result">
   <h2>Original Prompt</h2>
   <div class="prompt-box">
     <p>Generate a full-screen Three.js scene featuring a seamlessly looping animated gradient designed for <strong>GPU efficiency</strong>. The gradient should transition through a spectrum of at least four distinct and vibrant colours in a non-linear and unpredictable way, avoiding simple linear interpolation.</p>
@@ -472,51 +516,4 @@ custom_html: full-screen
   </div>
 </section>
 
-<style>
-  .prompt-box, .result-box {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    padding: 20px;
-    margin: 20px 0;
-    border-left: 4px solid rgba(100, 100, 255, 0.5);
-  }
-  
-  .prompt-box {
-    border-left-color: rgba(100, 100, 255, 0.5);
-  }
-  
-  .result-box {
-    border-left-color: rgba(100, 255, 100, 0.5);
-  }
-  
-  .prompt-and-result h2 {
-    margin-top: 40px;
-  }
-  
-  .prompt-and-result h3 {
-    margin-top: 25px;
-    color: rgba(255, 255, 255, 0.9);
-  }
-  
-  .prompt-and-result h4 {
-    margin-top: 20px;
-    color: rgba(255, 255, 255, 0.8);
-  }
-  
-  .prompt-and-result ul {
-    margin-left: 20px;
-  }
-  
-  .prompt-and-result li {
-    margin-bottom: 10px;
-    line-height: 1.5;
-  }
-  
-  code {
-    background: rgba(0, 0, 0, 0.4);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 0.9em;
-  }
-</style>
+

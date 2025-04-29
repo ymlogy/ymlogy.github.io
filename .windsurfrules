@@ -39,7 +39,6 @@ rules:
       - html_structure:
           forbid_full_document_tags: ["!DOCTYPE", "html", "head", "body"]
           container_class: "threejs-container"
-          scoped_styles: true
           preserve_hugo_layout: false
       - script_handling:
           external_scripts_last: true
@@ -48,62 +47,51 @@ rules:
           full_viewport: true
     implementation_guide:
       - container_structure: |
-          Always wrap Three.js scene in a div with class="threejs-container".
-          This container should be the first element after the front matter.
+          Place a single `<style>` block immediately after the front matter to hold all custom CSS for the post.
+          Immediately after the `<style>` block, wrap the animation scene (scripts, etc.) in a single div.
+          Use class="threejs-container" for Three.js or class="webgl-container" for generic WebGL.
           Example:
           ```html
-          <div class="threejs-container">
-            <style scoped>
-              .threejs-container {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100vw;
-                height: 100vh;
-                z-index: -1;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin: 0;
-              }
-              .threejs-container canvas {
-                display: block;
-                width: 100%;
-                height: 100%;
-              }
-            </style>
-            <!-- Three.js scripts and initialization here -->
+          ---
+          frontmatter
+          ---
+          <style>
+            /* Styles for .threejs-container, canvas, AND .content-container go here */
+            .threejs-container {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100vw;
+              height: 100vh;
+              z-index: -1;
+              /* ... other styles */
+            }
+
+            .threejs-container canvas {
+              display: block;
+              width: 100%;
+              height: 100%;
+            }
+
+            .content-container {
+               /* ... content overlay styles */
+               background: rgba(0, 0, 0, 0.1);
+               border-radius: 8px;
+               box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+               padding: 2rem;
+               margin: 5vh auto;
+               max-width: 800px;
+               position: relative;
+               z-index: 1;
+            }
+          </style>
+
+          <div class="threejs-container"> <!-- Container div -->
+          <canvas id="threejs-container"></canvas> <!-- Canvas element -->
+            <!-- All <script type="importmap">, <script type="module">, etc. go here -->
+            <script>...</script>
           </div>
           ```
-      - canvas_positioning: |
-          The Three.js canvas must be positioned as a fixed background element:
-          - Use position: fixed for the container
-          - Set z-index: -1 to place it behind content
-          - Use width: 100vw and height: 100vh for full viewport coverage
-          - Append the renderer.domElement to the .threejs-container element
-          - Example: document.querySelector('.threejs-container').appendChild(renderer.domElement);
-      - content_structure: |
-          Place regular content outside the threejs-container div.
-          This allows the Hugo theme to handle the content layout while the Three.js
-          animation serves as a background.
-          
-          IMPORTANT: Do not override Hugo theme's layout styles. Only apply minimal styling to 
-          the content container:
-          ```css
-          .content-container {
-            background: rgba(0, 0, 0, 0.1);  /* Subtle background */
-            border-radius: 8px;              /* Rounded corners */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Subtle shadow */
-          }
-          ```
-          Avoid setting position, width, margins, padding, or typography styles that would 
-          override the Hugo theme's layout.
-      - controls_positioning: |
-          If adding interactive controls:
-          - Place controls outside the threejs-container
-          - Use position: fixed with appropriate z-index (> 0)
-          - Consider bottom-right positioning (bottom: 20px; right: 20px;) for less intrusive UI
-          - Toggle visibility with keyboard shortcuts (e.g., press 'c' to show/hide)
 
   html_custom_controls:
     description: "Full-screen Three.js background posts with OrbitControls"
