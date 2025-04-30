@@ -9,22 +9,30 @@ custom_html: full-screen
 ---
 
 <style>
-  .threejs-container {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      /* Make canvas larger than viewport for visual effect */
-      width: 140vw;
-      display: block;
-      z-index: -1;
+    /* Fix for mobile address bar scrolling issue */
+    html, body {
+        height: 100%;
+        margin: 0;
+        overflow-x: hidden;
+    }
+    
+    #noise-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
     }
 
-  .threejs-container canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
+    .content-container {
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        
+        position: relative;
+        z-index: 1;
+    }
   .content-container {
     background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -34,8 +42,7 @@ custom_html: full-screen
     z-index: 1;
   }
 </style>
-<div class="threejs-container">
-  <canvas id="threejs-canvas"></canvas>
+<div id="noise-container"></div>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
     // === Three.js 3D Concentric Maze Background ===
@@ -50,11 +57,19 @@ custom_html: full-screen
     const CAMERA_DISTANCE_FACTOR = 0.35; // How far out from the last ring the camera starts
     const CAMERA_ANGLE_DEG =30;
 
-    // Get canvas and set up renderer
-    const canvas = document.getElementById('threejs-canvas');
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false }); // Enabled antialias for 3D
+    // Mobile detection
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Get container and set up renderer
+    const container = document.getElementById('noise-container');
+    const renderer = new THREE.WebGLRenderer({ 
+        antialias: !isMobile,
+        alpha: true,
+        powerPreference: 'high-performance'
+    });
     renderer.setClearColor(BG_COLOR, 1);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
 
     // Scene
     const scene = new THREE.Scene();
@@ -194,22 +209,32 @@ custom_html: full-screen
     }
 
     // --- Resize Handler ---
+    let resizeTimeout;
+    let lastWidth = window.innerWidth;
+    let initialHeight = window.innerHeight;
+    
     function resizeRenderer() {
-      // Use canvas dimensions, not window dimensions
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-      // Check if dimensions are valid and resizing is needed
-      const needResize = canvas.width !== w || canvas.height !== h;
-      if (needResize) {
-          renderer.setSize(w, h, false); // Set buffer size (false = don't set style)
-      }
-      camera.aspect = w / h;   // Update camera aspect ratio
-      camera.updateProjectionMatrix(); // Apply changes
+        // Only update if width changed significantly (>5% change)
+        const currentWidth = window.innerWidth;
+        const widthChange = Math.abs(currentWidth - lastWidth) / lastWidth;
+        
+        if (widthChange > 0.05) {
+            // Keep the initial height to prevent layout shifts on mobile scrolling
+            renderer.setSize(currentWidth, initialHeight);
+            lastWidth = currentWidth;
+            
+            // Update camera aspect ratio
+            camera.aspect = currentWidth / initialHeight;
+            camera.updateProjectionMatrix();
+        }
     }
 
     // Initial setup and event listener
     resizeRenderer(); // Initial size
-    window.addEventListener('resize', resizeRenderer);
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resizeRenderer, 100);
+    });
 
     // --- Animation Loop ---
     let animationId;
