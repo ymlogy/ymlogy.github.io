@@ -101,7 +101,8 @@ custom_html: full-screen
       const material = new THREE.PointsMaterial({
         color: 0xffffff,
         size: 0.6, // Increased size for brightness
-        sizeAttenuation: false // Stars stay same size regardless of distance
+        sizeAttenuation: false, // Stars stay same size regardless of distance
+        depthWrite: false // Prevent stars from writing to depth buffer
       });
 
       stars = new THREE.Points(geometry, material);
