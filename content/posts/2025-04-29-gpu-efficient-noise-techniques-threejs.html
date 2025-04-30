@@ -26,7 +26,7 @@ custom_html: full-screen
     height: 100%;
   }
   .content-container {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
     
@@ -221,65 +221,89 @@ custom_html: full-screen
 </div>
 <div class="content-container">
 
-# GPU-Efficient Noise Techniques in Three.js
+<p>Ah, a fellow traveler seeking more efficient paths in the realm of real-time rendering! You're right, calculating complex noise per-pixel every frame can be a real GPU hog. Thankfully, Three.js offers several more GPU-friendly alternatives. Let's explore some of the most common and effective approaches:</p>
 
-Ah, a fellow traveler seeking more efficient paths in the realm of real-time rendering! You're right, calculating complex noise per-pixel every frame can be a real GPU hog. Thankfully, Three.js offers several more GPU-friendly alternatives. Let's explore some of the most common and effective approaches:
+<ol>
+  <li>
+    <p><strong>Pre-computed Noise Textures:</strong></p>
+    <ul>
+      <li><strong>Concept:</strong> Instead of generating noise on the fly, you calculate the noise texture once (either offline or during the scene loading) and then sample from this texture in your shaders.</li>
+      <li><strong>How it works:</strong> You can use various tools or libraries (like `simplex-noise` in JavaScript) to generate a 2D or 3D noise texture. This texture is then loaded into Three.js as a `Texture` and passed as a uniform to your materials. In your shader, you use the UV coordinates (for 2D) or world position (for 3D) to sample the pre-computed noise value.</li>
+      <li><strong>GPU Efficiency:</strong> This is significantly more efficient because the complex noise calculation happens only once, not per-pixel per frame. The GPU only performs a texture lookup, which is a highly optimized operation.</li>
+      <li><strong>Considerations:</strong>
+        <ul>
+          <li><strong>Memory Usage:</strong> Larger or higher-resolution noise textures will consume more GPU memory.</li>
+          <li><strong>Static Nature:</strong> The noise pattern is static unless you explicitly update the texture (which can still be less expensive than per-pixel calculation).</li>
+          <li><strong>Tiling:</strong> You might need to handle tiling artifacts if your UVs or positions go beyond the texture boundaries.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Procedural Noise with Simplified Shader Functions:</strong></p>
+    <ul>
+      <li><strong>Concept:</strong> Implement a simpler noise algorithm directly within your shader. While still procedural, these algorithms are designed to be less computationally intensive than complex noise functions.</li>
+      <li><strong>How it works:</strong> You write GLSL code in your vertex or fragment shader that generates a noise-like pattern based on input parameters like UV coordinates, world position, or time. Simpler algorithms like value noise with fewer octaves or basic gradient noise implementations can be used.</li>
+      <li><strong>GPU Efficiency:</strong> More efficient than complex per-pixel noise because the calculations within the shader are streamlined.</li>
+      <li><strong>Considerations:</strong>
+        <ul>
+          <li><strong>Quality:</strong> Simplified noise algorithms might not produce the same level of detail or visual complexity as more advanced methods.</li>
+          <li><strong>Shader Complexity:</strong> While simpler, the shader will still perform calculations per-pixel. Careful optimization of the noise function is crucial.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Noise Libraries Optimized for Shaders:</strong></p>
+    <ul>
+      <li><strong>Concept:</strong> Utilize GLSL noise libraries that are specifically designed for GPU performance. These libraries often contain optimized implementations of various noise algorithms.</li>
+      <li><strong>How it works:</strong> You include the GLSL code from these libraries directly into your shader. They provide functions you can call to generate noise based on your inputs.</li>
+      <li><strong>GPU Efficiency:</strong> These libraries are often written with performance in mind, leveraging GPU-friendly operations and minimizing complex branching or calculations.</li>
+      <li><strong>Considerations:</strong>
+        <ul>
+          <li><strong>Integration:</strong> You need to manage and include the GLSL code within your Three.js shader material.</li>
+          <li><strong>Learning Curve:</strong> Understanding how to use the specific functions provided by the library might require some learning.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Using Built-in Textures and Transformations:</strong></p>
+    <ul>
+      <li><strong>Concept:</strong> Leverage existing texture patterns (like gradients, patterns, or even simpler noise textures) and animate or transform their UV coordinates or the object's geometry to create the illusion of dynamic noise.</li>
+      <li><strong>How it works:</strong> You can use `TextureLoader` to load simple grayscale textures. In your shader, you can then manipulate the UV coordinates based on time or other parameters to make the texture appear to move, scale, or rotate, creating a dynamic effect. Alternatively, you can animate the object's vertices in the vertex shader based on time or other inputs to create wave-like or turbulent motions.</li>
+      <li><strong>GPU Efficiency:</strong> This is generally very efficient as it relies on optimized texture sampling and relatively simple transformations.</li>
+      <li><strong>Considerations:</strong>
+        <ul>
+          <li><strong>Visual Complexity:</strong> The resulting effects might be less intricate than true procedural noise.</li>
+          <li><strong>Creativity:</strong> Requires clever manipulation of textures and transformations to achieve desired results.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Vertex-Based Noise and Interpolation:</strong></p>
+    <ul>
+      <li><strong>Concept:</strong> Calculate noise or displacement at the vertices of your geometry in the vertex shader and then let the GPU's rasterizer interpolate these values across the faces.</li>
+      <li><strong>How it works:</strong> In your vertex shader, you calculate a noise value (using a pre-computed texture or a simple procedural function) based on the vertex position. You can then use this noise value to displace the vertex along its normal or in other directions. The fragment shader then interpolates these displaced positions and potentially other vertex attributes (like noise values) across the surface.</li>
+      <li><strong>GPU Efficiency:</strong> Significantly reduces per-pixel calculations as the noise is only evaluated per vertex. The interpolation is handled efficiently by the GPU.</li>
+      <li><strong>Considerations:</strong>
+        <ul>
+          <li><strong>Detail:</strong> The level of detail in the noise effect is limited by the vertex density of your geometry. Lower poly counts will result in smoother, less detailed noise.</li>
+          <li><strong>Silhouette:</strong> The displacement affects the object's silhouette.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
 
-**1. Pre-computed Noise Textures:**
+<p><strong>Which approach is best?</strong> It often depends on the specific requirements of your scene:</p>
+<ul>
+  <li>For highly detailed but mostly static noise, <strong>pre-computed textures</strong> are excellent.</li>
+  <li>For simpler, dynamic patterns, <strong>simplified shader functions</strong> or <strong>texture transformations</strong> can be very effective.</li>
+  <li>When visual quality and complexity are paramount but you still need better performance than raw per-pixel noise, <strong>optimized GLSL libraries</strong> or <strong>vertex-based noise</strong> are good choices.</li>
+</ul>
 
-* **Concept:** Instead of generating noise on the fly, you calculate the noise texture once (either offline or during the scene loading) and then sample from this texture in your shaders.
-* **How it works:** You can use various tools or libraries (like `simplex-noise` in JavaScript) to generate a 2D or 3D noise texture. This texture is then loaded into Three.js as a `Texture` and passed as a uniform to your materials. In your shader, you use the UV coordinates (for 2D) or world position (for 3D) to sample the pre-computed noise value.
-* **GPU Efficiency:** This is significantly more efficient because the complex noise calculation happens only once, not per-pixel per frame. The GPU only performs a texture lookup, which is a highly optimized operation.
-* **Considerations:**
-    * **Memory Usage:** Larger or higher-resolution noise textures will consume more GPU memory.
-    * **Static Nature:** The noise pattern is static unless you explicitly update the texture (which can still be less expensive than per-pixel calculation).
-    * **Tiling:** You might need to handle tiling artifacts if your UVs or positions go beyond the texture boundaries.
-
-**2. Procedural Noise with Simplified Shader Functions:**
-
-* **Concept:** Implement a simpler noise algorithm directly within your shader. While still procedural, these algorithms are designed to be less computationally intensive than complex noise functions.
-* **How it works:** You write GLSL code in your vertex or fragment shader that generates a noise-like pattern based on input parameters like UV coordinates, world position, or time. Simpler algorithms like value noise with fewer octaves or basic gradient noise implementations can be used.
-* **GPU Efficiency:** More efficient than complex per-pixel noise because the calculations within the shader are streamlined.
-* **Considerations:**
-    * **Quality:** Simplified noise algorithms might not produce the same level of detail or visual complexity as more advanced methods.
-    * **Shader Complexity:** While simpler, the shader will still perform calculations per-pixel. Careful optimization of the noise function is crucial.
-
-**3. Noise Libraries Optimized for Shaders:**
-
-* **Concept:** Utilize GLSL noise libraries that are specifically designed for GPU performance. These libraries often contain optimized implementations of various noise algorithms.
-* **How it works:** You include the GLSL code from these libraries directly into your shader. They provide functions you can call to generate noise based on your inputs.
-* **GPU Efficiency:** These libraries are often written with performance in mind, leveraging GPU-friendly operations and minimizing complex branching or calculations.
-* **Considerations:**
-    * **Integration:** You need to manage and include the GLSL code within your Three.js shader material.
-    * **Learning Curve:** Understanding how to use the specific functions provided by the library might require some learning.
-
-**4. Using Built-in Textures and Transformations:**
-
-* **Concept:** Leverage existing texture patterns (like gradients, patterns, or even simpler noise textures) and animate or transform their UV coordinates or the object's geometry to create the illusion of dynamic noise.
-* **How it works:** You can use `TextureLoader` to load simple grayscale textures. In your shader, you can then manipulate the UV coordinates based on time or other parameters to make the texture appear to move, scale, or rotate, creating a dynamic effect. Alternatively, you can animate the object's vertices in the vertex shader based on time or other inputs to create wave-like or turbulent motions.
-* **GPU Efficiency:** This is generally very efficient as it relies on optimized texture sampling and relatively simple transformations.
-* **Considerations:**
-    * **Visual Complexity:** The resulting effects might be less intricate than true procedural noise.
-    * **Creativity:** Requires clever manipulation of textures and transformations to achieve desired results.
-
-**5. Vertex-Based Noise and Interpolation:**
-
-* **Concept:** Calculate noise or displacement at the vertices of your geometry in the vertex shader and then let the GPU's rasterizer interpolate these values across the faces.
-* **How it works:** In your vertex shader, you calculate a noise value (using a pre-computed texture or a simple procedural function) based on the vertex position. You can then use this noise value to displace the vertex along its normal or in other directions. The fragment shader then interpolates these displaced positions and potentially other vertex attributes (like noise values) across the surface.
-* **GPU Efficiency:** Significantly reduces per-pixel calculations as the noise is only evaluated per vertex. The interpolation is handled efficiently by the GPU.
-* **Considerations:**
-    * **Detail:** The level of detail in the noise effect is limited by the vertex density of your geometry. Lower poly counts will result in smoother, less detailed noise.
-    * **Silhouette:** The displacement affects the object's silhouette.
-
-**Choosing the Right Approach:**
-
-The best approach depends on the specific visual effect you're trying to achieve and the performance budget of your application.
-
-* For complex, detailed, and relatively static noise patterns, **pre-computed noise textures** are often the most efficient.
-* For dynamic and moderately complex noise, **simplified shader functions** or **optimized noise libraries** can be a good balance.
-* For subtle animations or distortions, **using built-in textures and transformations** can be surprisingly effective and very performant.
-* For deforming geometry with noise, **vertex-based noise and interpolation** is a powerful technique.
-
-Experimenting with these different methods will give you a better understanding of their trade-offs and help you find the most GPU-efficient way to achieve your desired visual style in Three.js. Good luck on your rendering adventures!
+<p>Often, a combination of techniques yields the best balance between visual fidelity and performance. Experiment and profile to see what works best for your particular use case!</p>
 
 </div>
