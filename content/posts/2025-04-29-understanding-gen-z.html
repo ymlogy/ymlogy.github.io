@@ -16,9 +16,6 @@ custom_html: full-screen
       transform: translate(-50%, -50%);
       /* Make canvas larger than viewport for visual effect */
       width: 140vw;
-      height: 140vh;
-      min-width: 100vw;
-      min-height: 100vh;
       display: block;
       z-index: -1;
     }
@@ -158,6 +155,18 @@ custom_html: full-screen
       material.dispose();
       renderer.dispose();
     });
+  </script>
+  <script>
+    function setThreejsBgHeight() {
+      var bg = document.querySelector('.threejs-container');
+      if (bg) {
+        bg.style.height = window.innerHeight + 'px';
+        bg.style.minHeight = window.innerHeight + 'px';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', setThreejsBgHeight);
+    window.addEventListener('resize', setThreejsBgHeight);
+    window.addEventListener('orientationchange', setThreejsBgHeight);
   </script>
 </div>
 <div class="content-container">
