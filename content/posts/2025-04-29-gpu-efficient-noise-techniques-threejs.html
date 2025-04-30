@@ -1,0 +1,285 @@
+---
+title: "GPU-Efficient Noise Techniques in Three.js"
+date: 2025-04-29
+draft: false
+description: "Exploring various methods like pre-computed textures, procedural shaders, and vertex noise to optimize real-time noise generation in Three.js for better GPU performance."
+tags: ["three.js", "webgl", "gpu", "performance", "optimization", "noise", "shaders", "procedural generation", "texture mapping"]
+categories: ["web development", "graphics", "tutorial", "performance"]
+custom_html: full-screen
+---
+
+<style>
+  .threejs-container {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      /* Make canvas larger than viewport for visual effect */
+      width: 140vw;
+      display: block;
+      z-index: -1;
+    }
+
+  .threejs-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .content-container {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    
+    position: relative;
+    z-index: 1;
+  }
+</style>
+<div class="threejs-container">
+  <canvas id="threejs-container"></canvas>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script>
+    // === Three.js 3D Concentric Maze Background ===
+    // Colors
+    const BG_COLOR = new THREE.Color(0x0a1647); // dark blue
+    const MAZE_COLOR = new THREE.Color(0x8B5C2A); // brown
+
+    // Parameters
+    const RING_THICKNESS = 0.015; // Tube radius for the tori
+    const MAZE_SPACING = 0.12;   // Distance between ring centers
+    const NUM_RINGS = 15;        // How many rings to generate
+    const CAMERA_DISTANCE_FACTOR = 0.35; // How far out from the last ring the camera starts
+    const CAMERA_ANGLE_DEG =30;
+
+    // Get canvas and set up renderer
+    const canvas = document.getElementById('threejs-container');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false }); // Enabled antialias for 3D
+    renderer.setClearColor(BG_COLOR, 1);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    // Scene
+    const scene = new THREE.Scene();
+
+    // Camera (Perspective)
+    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+    const outerRadius = (NUM_RINGS - 1) * MAZE_SPACING;
+    const cameraDistance = outerRadius * CAMERA_DISTANCE_FACTOR;
+    const cameraHeight = cameraDistance * Math.sin(CAMERA_ANGLE_DEG * Math.PI / 180);
+    const cameraHorizontalDist = cameraDistance * Math.cos(CAMERA_ANGLE_DEG * Math.PI / 180);
+
+    camera.position.set(0, -cameraHorizontalDist, cameraHeight); // Position out along -Y, and up Z (Rotated 90 deg CW)
+    camera.lookAt(0, 0, 0); // Look towards the center
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 10, 7.5);
+    scene.add(directionalLight);
+
+    // --- Maze Geometry and Material ---
+    const mazeGroup = new THREE.Group();
+    scene.add(mazeGroup);
+
+    const vertexShader = `
+      varying vec3 vWorldPosition;
+      varying vec2 vUv;
+      void main() {
+        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPosition.xyz;
+        vUv = uv; // Pass UVs for potential texture use later
+        gl_Position = projectionMatrix * viewMatrix * worldPosition;
+      }
+    `;
+
+    const fragmentShader = `
+      precision mediump float;
+      uniform float u_time;
+      uniform vec3 u_mazeColor;
+      uniform float u_mazeSpacing;
+      uniform float u_ringBaseRadius; // Base radius of this specific torus
+
+      varying vec3 vWorldPosition;
+      varying vec2 vUv;
+
+      const float PI = 3.14159265359;
+
+      void main() {
+        // Calculate polar coordinates in XY plane from world position
+        float r = length(vWorldPosition.xy); // Distance from center in XY plane
+        float theta = atan(vWorldPosition.y, vWorldPosition.x);
+
+        // Spin: rotate pattern over time
+        float spin = u_time * 0.15; // slow clockwise
+        theta -= spin;
+
+        // Maze gap logic (adapted from 2D version)
+        // Note: u_ringBaseRadius helps determine steps for *this* ring
+        float mazeSteps = 8.0 + floor(u_ringBaseRadius / u_mazeSpacing) * 2.0;
+        float mazeAngle = 2.0 * PI / mazeSteps;
+        float sector = mod(theta + PI, mazeAngle);
+        // Dynamic gap size based on radius and time
+        float gap = 0.3 + 0.18 * sin(floor(u_ringBaseRadius / u_mazeSpacing) * 2.3 + u_time * 0.4);
+        float gapAngle = mazeAngle * gap;
+
+        // Discard fragments that fall into the calculated gap
+        if (sector < gapAngle) {
+          discard;
+        }
+
+        // Color output for visible parts
+        gl_FragColor = vec4(u_mazeColor, 1.0);
+      }
+    `;
+
+    // Create multiple tori
+    const tori = [];
+    for (let i = 0; i < NUM_RINGS; i++) {
+      const ringRadius = i * MAZE_SPACING;
+      // Skip ring 0 (center point)
+      if (ringRadius <= 0.0) continue;
+
+      const geometry = new THREE.TorusGeometry(ringRadius, RING_THICKNESS, 16, 100); // Adjust segments as needed
+
+      // Each torus needs its own material instance ONLY IF uniforms differ per torus
+      // Here, u_ringBaseRadius differs, so we need separate materials.
+      const material = new THREE.ShaderMaterial({
+          uniforms: {
+              u_time: { value: 0 },
+              u_mazeColor: { value: MAZE_COLOR },
+              u_mazeSpacing: { value: MAZE_SPACING },
+              u_ringBaseRadius: { value: ringRadius } // Pass the base radius
+          },
+          vertexShader,
+          fragmentShader,
+          // side: THREE.DoubleSide // Optional: Render backfaces if needed
+      });
+
+      const torus = new THREE.Mesh(geometry, material);
+      mazeGroup.add(torus);
+      tori.push(torus); // Store for cleanup and uniform updates
+    }
+
+    // --- Resize Handler ---
+    function resizeRenderer() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      renderer.setSize(w, h); // Resize renderer
+      camera.aspect = w / h;   // Update camera aspect ratio
+      camera.updateProjectionMatrix(); // Apply changes
+    }
+
+    // Initial setup and event listener
+    resizeRenderer(); // Initial size
+    window.addEventListener('resize', resizeRenderer);
+
+    // --- Animation Loop ---
+    let animationId;
+    const clock = new THREE.Clock();
+
+    function animate() {
+      animationId = requestAnimationFrame(animate);
+
+      const elapsedTime = clock.getElapsedTime();
+
+      // Update time uniform for all torus materials
+      tori.forEach(torus => {
+          torus.material.uniforms.u_time.value = elapsedTime;
+      });
+
+      // Optional: Rotate the whole maze group slowly if desired
+      // mazeGroup.rotation.z = elapsedTime * 0.05;
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // --- Cleanup --- 
+    window.addEventListener('beforeunload', () => {
+      cancelAnimationFrame(animationId);
+      tori.forEach(torus => {
+        torus.geometry.dispose();
+        torus.material.dispose();
+      });
+      renderer.dispose();
+      // Dispose lights if needed
+      ambientLight.dispose();
+      directionalLight.dispose();
+    });
+  </script>
+  <script>
+    function setThreejsBgHeight() {
+      var bg = document.querySelector('.threejs-container');
+      if (bg) {
+        bg.style.height = window.innerHeight + 'px';
+        bg.style.minHeight = window.innerHeight + 'px';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', setThreejsBgHeight);
+    window.addEventListener('resize', setThreejsBgHeight);
+    window.addEventListener('orientationchange', setThreejsBgHeight);
+  </script>
+</div>
+<div class="content-container">
+
+# GPU-Efficient Noise Techniques in Three.js
+
+Ah, a fellow traveler seeking more efficient paths in the realm of real-time rendering! You're right, calculating complex noise per-pixel every frame can be a real GPU hog. Thankfully, Three.js offers several more GPU-friendly alternatives. Let's explore some of the most common and effective approaches:
+
+**1. Pre-computed Noise Textures:**
+
+* **Concept:** Instead of generating noise on the fly, you calculate the noise texture once (either offline or during the scene loading) and then sample from this texture in your shaders.
+* **How it works:** You can use various tools or libraries (like `simplex-noise` in JavaScript) to generate a 2D or 3D noise texture. This texture is then loaded into Three.js as a `Texture` and passed as a uniform to your materials. In your shader, you use the UV coordinates (for 2D) or world position (for 3D) to sample the pre-computed noise value.
+* **GPU Efficiency:** This is significantly more efficient because the complex noise calculation happens only once, not per-pixel per frame. The GPU only performs a texture lookup, which is a highly optimized operation.
+* **Considerations:**
+    * **Memory Usage:** Larger or higher-resolution noise textures will consume more GPU memory.
+    * **Static Nature:** The noise pattern is static unless you explicitly update the texture (which can still be less expensive than per-pixel calculation).
+    * **Tiling:** You might need to handle tiling artifacts if your UVs or positions go beyond the texture boundaries.
+
+**2. Procedural Noise with Simplified Shader Functions:**
+
+* **Concept:** Implement a simpler noise algorithm directly within your shader. While still procedural, these algorithms are designed to be less computationally intensive than complex noise functions.
+* **How it works:** You write GLSL code in your vertex or fragment shader that generates a noise-like pattern based on input parameters like UV coordinates, world position, or time. Simpler algorithms like value noise with fewer octaves or basic gradient noise implementations can be used.
+* **GPU Efficiency:** More efficient than complex per-pixel noise because the calculations within the shader are streamlined.
+* **Considerations:**
+    * **Quality:** Simplified noise algorithms might not produce the same level of detail or visual complexity as more advanced methods.
+    * **Shader Complexity:** While simpler, the shader will still perform calculations per-pixel. Careful optimization of the noise function is crucial.
+
+**3. Noise Libraries Optimized for Shaders:**
+
+* **Concept:** Utilize GLSL noise libraries that are specifically designed for GPU performance. These libraries often contain optimized implementations of various noise algorithms.
+* **How it works:** You include the GLSL code from these libraries directly into your shader. They provide functions you can call to generate noise based on your inputs.
+* **GPU Efficiency:** These libraries are often written with performance in mind, leveraging GPU-friendly operations and minimizing complex branching or calculations.
+* **Considerations:**
+    * **Integration:** You need to manage and include the GLSL code within your Three.js shader material.
+    * **Learning Curve:** Understanding how to use the specific functions provided by the library might require some learning.
+
+**4. Using Built-in Textures and Transformations:**
+
+* **Concept:** Leverage existing texture patterns (like gradients, patterns, or even simpler noise textures) and animate or transform their UV coordinates or the object's geometry to create the illusion of dynamic noise.
+* **How it works:** You can use `TextureLoader` to load simple grayscale textures. In your shader, you can then manipulate the UV coordinates based on time or other parameters to make the texture appear to move, scale, or rotate, creating a dynamic effect. Alternatively, you can animate the object's vertices in the vertex shader based on time or other inputs to create wave-like or turbulent motions.
+* **GPU Efficiency:** This is generally very efficient as it relies on optimized texture sampling and relatively simple transformations.
+* **Considerations:**
+    * **Visual Complexity:** The resulting effects might be less intricate than true procedural noise.
+    * **Creativity:** Requires clever manipulation of textures and transformations to achieve desired results.
+
+**5. Vertex-Based Noise and Interpolation:**
+
+* **Concept:** Calculate noise or displacement at the vertices of your geometry in the vertex shader and then let the GPU's rasterizer interpolate these values across the faces.
+* **How it works:** In your vertex shader, you calculate a noise value (using a pre-computed texture or a simple procedural function) based on the vertex position. You can then use this noise value to displace the vertex along its normal or in other directions. The fragment shader then interpolates these displaced positions and potentially other vertex attributes (like noise values) across the surface.
+* **GPU Efficiency:** Significantly reduces per-pixel calculations as the noise is only evaluated per vertex. The interpolation is handled efficiently by the GPU.
+* **Considerations:**
+    * **Detail:** The level of detail in the noise effect is limited by the vertex density of your geometry. Lower poly counts will result in smoother, less detailed noise.
+    * **Silhouette:** The displacement affects the object's silhouette.
+
+**Choosing the Right Approach:**
+
+The best approach depends on the specific visual effect you're trying to achieve and the performance budget of your application.
+
+* For complex, detailed, and relatively static noise patterns, **pre-computed noise textures** are often the most efficient.
+* For dynamic and moderately complex noise, **simplified shader functions** or **optimized noise libraries** can be a good balance.
+* For subtle animations or distortions, **using built-in textures and transformations** can be surprisingly effective and very performant.
+* For deforming geometry with noise, **vertex-based noise and interpolation** is a powerful technique.
+
+Experimenting with these different methods will give you a better understanding of their trade-offs and help you find the most GPU-efficient way to achieve your desired visual style in Three.js. Good luck on your rendering adventures!
+
+</div>
