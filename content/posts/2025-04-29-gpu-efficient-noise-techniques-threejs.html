@@ -35,7 +35,7 @@ custom_html: full-screen
   }
 </style>
 <div class="threejs-container">
-  <canvas id="threejs-container"></canvas>
+  <canvas id="threejs-canvas"></canvas>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script>
     // === Three.js 3D Concentric Maze Background ===
@@ -51,7 +51,7 @@ custom_html: full-screen
     const CAMERA_ANGLE_DEG =30;
 
     // Get canvas and set up renderer
-    const canvas = document.getElementById('threejs-container');
+    const canvas = document.getElementById('threejs-canvas');
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false }); // Enabled antialias for 3D
     renderer.setClearColor(BG_COLOR, 1);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -161,9 +161,14 @@ custom_html: full-screen
 
     // --- Resize Handler ---
     function resizeRenderer() {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      renderer.setSize(w, h); // Resize renderer
+      // Use canvas dimensions, not window dimensions
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      // Check if dimensions are valid and resizing is needed
+      const needResize = canvas.width !== w || canvas.height !== h;
+      if (needResize) {
+          renderer.setSize(w, h, false); // Set buffer size (false = don't set style)
+      }
       camera.aspect = w / h;   // Update camera aspect ratio
       camera.updateProjectionMatrix(); // Apply changes
     }
