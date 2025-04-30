@@ -7,7 +7,6 @@ tags: ["three.js", "webgl", "gpu", "performance", "optimization", "noise", "shad
 categories: ["web development", "graphics", "tutorial", "performance"]
 custom_html: full-screen
 ---
-
 <style>
     /* Fix for mobile address bar scrolling issue */
     html, body {
@@ -212,20 +211,31 @@ custom_html: full-screen
     let resizeTimeout;
     let lastWidth = window.innerWidth;
     let initialHeight = window.innerHeight;
-    
+
     function resizeRenderer() {
-        // Only update if width changed significantly (>5% change)
         const currentWidth = window.innerWidth;
-        const widthChange = Math.abs(currentWidth - lastWidth) / lastWidth;
-        
-        if (widthChange > 0.05) {
-            // Keep the initial height to prevent layout shifts on mobile scrolling
-            renderer.setSize(currentWidth, initialHeight);
-            lastWidth = currentWidth;
-            
-            // Update camera aspect ratio
-            camera.aspect = currentWidth / initialHeight;
+        let targetHeight = initialHeight;
+
+        if (isMobile) {
+            // Overfill the viewport to avoid layout shift when address bar disappears
+            targetHeight = Math.round(window.innerHeight * 1.15);
+            renderer.setSize(currentWidth, targetHeight, false);
+            camera.aspect = currentWidth / targetHeight;
+            // Zoom in: lower camera FOV or move camera closer
+            camera.fov = 60; // slightly wider for mobile
+            camera.position.set(0, -cameraHorizontalDist * 0.83, cameraHeight * 0.83); // move camera closer
             camera.updateProjectionMatrix();
+        } else {
+            // Desktop: preserve original logic
+            const widthChange = Math.abs(currentWidth - lastWidth) / lastWidth;
+            if (widthChange > 0.05) {
+                renderer.setSize(currentWidth, initialHeight, false);
+                lastWidth = currentWidth;
+                camera.aspect = currentWidth / initialHeight;
+                camera.fov = 50; // restore desktop FOV
+                camera.position.set(0, -cameraHorizontalDist, cameraHeight);
+                camera.updateProjectionMatrix();
+            }
         }
     }
 
@@ -288,9 +298,7 @@ custom_html: full-screen
   </script>
 </div>
 <div class="content-container">
-
 <p>Ah, a fellow traveler seeking more efficient paths in the realm of real-time rendering! You're right, calculating complex noise per-pixel every frame can be a real GPU hog. Thankfully, Three.js offers several more GPU-friendly alternatives. Let's explore some of the most common and effective approaches:</p>
-
 <ol>
   <li>
     <p><strong>Pre-computed Noise Textures:</strong></p>
