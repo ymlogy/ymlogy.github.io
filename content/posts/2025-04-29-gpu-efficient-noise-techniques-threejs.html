@@ -40,7 +40,7 @@ custom_html: full-screen
   <script>
     // === Three.js 3D Concentric Maze Background ===
     // Colors
-    const BG_COLOR = new THREE.Color(0x0a1647); // dark blue
+    const BG_COLOR = new THREE.Color(0x0a103d); // darker, less saturated blue
     const MAZE_COLOR = new THREE.Color(0x8B5C2A); // brown
 
     // Parameters
@@ -75,6 +75,39 @@ custom_html: full-screen
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(5, 10, 7.5);
     scene.add(directionalLight);
+
+    // --- Starfield --- 
+    let stars;
+    function createStarfield() {
+      const starCount = 5000;
+      const starSpread = 50; // How far out the stars spread
+      const vertices = [];
+      for (let i = 0; i < starCount; i++) {
+        // Spherical distribution
+        const phi = Math.acos(-1 + (2 * Math.random()));
+        const theta = Math.random() * 2 * Math.PI;
+        const r = Math.random() * starSpread;
+
+        const x = r * Math.sin(phi) * Math.cos(theta);
+        const y = r * Math.sin(phi) * Math.sin(theta);
+        const z = r * Math.cos(phi);
+
+        vertices.push(x, y, z);
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+      const material = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.6, // Increased size for brightness
+        sizeAttenuation: false // Stars stay same size regardless of distance
+      });
+
+      stars = new THREE.Points(geometry, material);
+      scene.add(stars);
+    }
+    createStarfield(); // Add stars to the scene
 
     // --- Maze Geometry and Material ---
     const mazeGroup = new THREE.Group();
@@ -205,6 +238,10 @@ custom_html: full-screen
         torus.geometry.dispose();
         torus.material.dispose();
       });
+      if (stars) { // Dispose stars if they exist
+        stars.geometry.dispose();
+        stars.material.dispose();
+      }
       renderer.dispose();
       // Dispose lights if needed
       ambientLight.dispose();
