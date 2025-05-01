@@ -13,6 +13,7 @@ custom_html: full-screen
         height: 100%;
         margin: 0;
         overflow-x: hidden;
+        overflow-y: hidden; /* Prevent vertical scrollbar */
     }
     
     #noise-container {
@@ -53,8 +54,8 @@ custom_html: full-screen
     const RING_THICKNESS = 0.015; // Tube radius for the tori
     const MAZE_SPACING = 0.12;   // Distance between ring centers
     const NUM_RINGS = 15;        // How many rings to generate
-    const CAMERA_DISTANCE_FACTOR = 0.35; // How far out from the last ring the camera starts
-    const CAMERA_ANGLE_DEG =30;
+    const CAMERA_DISTANCE_FACTOR = 2.35; // How far out from the last ring the camera starts
+    const CAMERA_ANGLE_DEG =40;
 
     // Mobile detection
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -80,7 +81,7 @@ custom_html: full-screen
     const cameraHeight = cameraDistance * Math.sin(CAMERA_ANGLE_DEG * Math.PI / 180);
     const cameraHorizontalDist = cameraDistance * Math.cos(CAMERA_ANGLE_DEG * Math.PI / 180);
 
-    camera.position.set(0, -cameraHorizontalDist, cameraHeight); // Position out along -Y, and up Z (Rotated 90 deg CW)
+    camera.position.set(-1.4, -cameraHorizontalDist, cameraHeight); // Position out along -Y, and up Z (Rotated 90 deg CW)
     camera.lookAt(0, 0, 0); // Look towards the center
 
     // Lighting
@@ -214,11 +215,11 @@ custom_html: full-screen
 
     function resizeRenderer() {
         const currentWidth = window.innerWidth;
-        let targetHeight = initialHeight;
+        const currentHeight = window.innerHeight;
 
         if (isMobile) {
             // Overfill the viewport to avoid layout shift when address bar disappears
-            targetHeight = Math.round(window.innerHeight * 1.15);
+            const targetHeight = Math.round(currentHeight * 1.15);
             renderer.setSize(currentWidth, targetHeight, false);
             camera.aspect = currentWidth / targetHeight;
             // Zoom in: lower camera FOV or move camera closer
@@ -226,16 +227,12 @@ custom_html: full-screen
             camera.position.set(0, -cameraHorizontalDist * 0.83, cameraHeight * 0.83); // move camera closer
             camera.updateProjectionMatrix();
         } else {
-            // Desktop: preserve original logic
-            const widthChange = Math.abs(currentWidth - lastWidth) / lastWidth;
-            if (widthChange > 0.05) {
-                renderer.setSize(currentWidth, initialHeight, false);
-                lastWidth = currentWidth;
-                camera.aspect = currentWidth / initialHeight;
-                camera.fov = 50; // restore desktop FOV
-                camera.position.set(0, -cameraHorizontalDist, cameraHeight);
-                camera.updateProjectionMatrix();
-            }
+            // Desktop: Use current window dimensions
+            renderer.setSize(currentWidth, currentHeight, false); 
+            camera.aspect = currentWidth / currentHeight;
+            camera.fov = 50; // restore desktop FOV
+            camera.position.set(0, -cameraHorizontalDist, cameraHeight);
+            camera.updateProjectionMatrix();
         }
     }
 

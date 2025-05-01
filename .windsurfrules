@@ -92,6 +92,24 @@ rules:
             <script>...</script>
           </div>
           ```
+      - mobile_fullscreen_threejs_best_practices: |
+          To ensure a Three.js background always fills the entire viewport on mobile and prevents layout shift (such as when the address bar hides on scroll):
+          1. Detect mobile devices (user agent or window.matchMedia).
+          2. In the resize handler, set the renderer size to window.innerWidth by window.innerHeight * 1.15 (or a similar factor) on mobile. This ensures the scene always overflows the viewport and prevents gaps or layout shift when the viewport height increases.
+          3. For PerspectiveCamera: Adjust the camera's FOV and position on mobile to "zoom in" so the scene fills the viewport, rather than being squeezed or letterboxed.
+          4. For OrthographicCamera: Adjust the camera's left/right/top/bottom bounds (or increase camera.zoom) so the visible area is smaller than the renderer, causing the scene to overfill the viewport. Example:
+             ```js
+             const aspect = width / height;
+             const overfill = 1.15; // same as renderer overfill
+             camera.left = -aspect * overfill / 2;
+             camera.right = aspect * overfill / 2;
+             camera.top = overfill / 2;
+             camera.bottom = -overfill / 2;
+             camera.updateProjectionMatrix();
+             ```
+          5. On desktop, use the standard logic (renderer size = window.innerWidth x initialHeight, standard camera settings).
+          6. Always update the camera's aspect ratio (for Perspective) or bounds (for Orthographic) and call updateProjectionMatrix after resizing.
+          This approach ensures the Three.js background fills the viewport at all times on mobile, with no layout shift as the address bar appears/disappears.
 
   html_custom_controls:
     description: "Full-screen Three.js background posts with OrbitControls"
