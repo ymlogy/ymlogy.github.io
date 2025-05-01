@@ -8,43 +8,39 @@ categories: ["web development", "graphics", "tutorial", "performance"]
 custom_html: full-screen
 ---
 <style>
-    /* Fix for mobile address bar scrolling issue */
-    html, body {
-        height: 100%;
-        margin: 0;
-        overflow-x: hidden;
-        overflow-y: hidden; /* Prevent vertical scrollbar */
-    }
-    
-    #noise-container {
+    /* Styles based on .windsurfrules */
+  
+
+    .threejs-container { /* Use class selector */
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw; /* Use viewport width */
+        height: 100vh; /* Use viewport height */
         z-index: -1;
+        /* outline: 1px dashed red; /* Debug outline */
     }
 
-    .content-container {
+    .threejs-container canvas { /* Style the canvas */
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .content-container { /* Adjusted styles from rules */
         background: rgba(0, 0, 0, 0.1);
         border-radius: 8px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        
         position: relative;
         z-index: 1;
     }
-  .content-container {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-    
-    position: relative;
-    z-index: 1;
-  }
 </style>
-<div id="noise-container"></div>
+
+<!-- Structure based on .windsurfrules -->
+<div class="threejs-container"> <!-- Use class -->
+  <canvas id="threejs-canvas"></canvas> <!-- Add explicit canvas -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script>
+  <script> // Move script inside container
     // === Three.js 3D Concentric Maze Background ===
     // Colors
     const BG_COLOR = new THREE.Color(0x0a103d); // darker, less saturated blue
@@ -54,22 +50,25 @@ custom_html: full-screen
     const RING_THICKNESS = 0.015; // Tube radius for the tori
     const MAZE_SPACING = 0.12;   // Distance between ring centers
     const NUM_RINGS = 15;        // How many rings to generate
-    const CAMERA_DISTANCE_FACTOR = 2.35; // How far out from the last ring the camera starts
-    const CAMERA_ANGLE_DEG =40;
+    const CAMERA_DISTANCE_FACTOR = 1.00; // How far out from the last ring the camera starts
+    const CAMERA_ANGLE_DEG =30;
 
     // Mobile detection
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Get container and set up renderer
-    const container = document.getElementById('noise-container');
+
+    // Get container and CANVAS
+    const container = document.querySelector('.threejs-container'); // Get container by class
+    const canvasElement = document.getElementById('threejs-canvas'); // Get canvas by ID
+
     const renderer = new THREE.WebGLRenderer({ 
+        canvas: canvasElement, // Pass canvas element
         antialias: !isMobile,
         alpha: true,
         powerPreference: 'high-performance'
     });
     renderer.setClearColor(BG_COLOR, 1);
     renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
+    // container.appendChild(renderer.domElement); // REMOVE: Renderer is attached via constructor
 
     // Scene
     const scene = new THREE.Scene();
@@ -81,7 +80,7 @@ custom_html: full-screen
     const cameraHeight = cameraDistance * Math.sin(CAMERA_ANGLE_DEG * Math.PI / 180);
     const cameraHorizontalDist = cameraDistance * Math.cos(CAMERA_ANGLE_DEG * Math.PI / 180);
 
-    camera.position.set(-1.4, -cameraHorizontalDist, cameraHeight); // Position out along -Y, and up Z (Rotated 90 deg CW)
+    camera.position.set(-.4, -cameraHorizontalDist, cameraHeight); // Position out along -Y, and up Z (Rotated 90 deg CW)
     camera.lookAt(0, 0, 0); // Look towards the center
 
     // Lighting
@@ -281,20 +280,10 @@ custom_html: full-screen
       directionalLight.dispose();
     });
   </script>
-  <script>
-    function setThreejsBgHeight() {
-      var bg = document.querySelector('.threejs-container');
-      if (bg) {
-        bg.style.height = window.innerHeight + 'px';
-        bg.style.minHeight = window.innerHeight + 'px';
-      }
-    }
-    window.addEventListener('DOMContentLoaded', setThreejsBgHeight);
-    // window.addEventListener('resize', setThreejsBgHeight); // Remove this line
-    window.addEventListener('orientationchange', setThreejsBgHeight);
-  </script>
-</div>
-<div class="content-container">
+</div> <!-- Close threejs-container -->
+
+<!-- Content now follows the container -->
+<div class="content-container px-4 py-8 md:px-8 md:py-12 prose prose-invert max-w-3xl mx-auto"> 
 <p>Ah, a fellow traveler seeking more efficient paths in the realm of real-time rendering! You're right, calculating complex noise per-pixel every frame can be a real GPU hog. Thankfully, Three.js offers several more GPU-friendly alternatives. Let's explore some of the most common and effective approaches:</p>
 <ol>
   <li>
