@@ -209,30 +209,12 @@ custom_html: full-screen
 
     // --- Resize Handler ---
     let resizeTimeout;
-    let lastWidth = window.innerWidth;
-    let initialHeight = window.innerHeight;
-
     function resizeRenderer() {
-        const currentWidth = window.innerWidth;
-        const currentHeight = window.innerHeight;
-
-        if (isMobile) {
-            // Overfill the viewport to avoid layout shift when address bar disappears
-            const targetHeight = Math.round(currentHeight * 1.15);
-            renderer.setSize(currentWidth, targetHeight, false);
-            camera.aspect = currentWidth / targetHeight;
-            // Zoom in: lower camera FOV or move camera closer
-            camera.fov = 60; // slightly wider for mobile
-            camera.position.set(0, -cameraHorizontalDist * 0.83, cameraHeight * 0.83); // move camera closer
-            camera.updateProjectionMatrix();
-        } else {
-            // Desktop: Use current window dimensions
-            renderer.setSize(currentWidth, currentHeight, false); 
-            camera.aspect = currentWidth / currentHeight;
-            camera.fov = 50; // restore desktop FOV
-            camera.position.set(0, -cameraHorizontalDist, cameraHeight);
-            camera.updateProjectionMatrix();
-        }
+        const width = window.innerWidth;
+        const height = window.innerHeight * (isMobile ? 1.15 : 1); // Adjust height factor for mobile
+        renderer.setSize(width, height);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
     }
 
     // Initial setup and event listener
