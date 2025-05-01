@@ -67,7 +67,7 @@ custom_html: full-screen
         powerPreference: 'high-performance'
     });
     renderer.setClearColor(BG_COLOR, 1);
-    renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio, 1.5) : window.devicePixelRatio);
+    renderer.setPixelRatio(isMobile ? 1.0 : window.devicePixelRatio);
     // container.appendChild(renderer.domElement); // REMOVE: Renderer is attached via constructor
 
     // Scene
