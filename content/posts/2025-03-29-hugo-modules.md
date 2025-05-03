@@ -4,7 +4,7 @@ date: 2025-03-29
 draft: false
 description: "An overview of Hugo Modules"
 tags: ["hugo", "modules"]
-categories: ["general", "hugo", "modules"]
+categories: ["general", "hugo"]
 ---
 
 ### **Overview of Hugo Modules**
