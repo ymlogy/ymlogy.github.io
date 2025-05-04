@@ -200,20 +200,21 @@ custom_html: full-screen
 
     // --- Resize Handler ---
     let resizeTimeout;
-    function resizeRenderer() {
-        const width = window.innerWidth;
-        const height = window.innerHeight * (isMobile ? 1.15 : 1); // Adjust height factor for mobile
-        renderer.setSize(width, height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
+    function handleResize() {
+      if (renderer?.getContext().isContextLost()) {
+        cleanupResources();
+        init();
+      }
+      const width = window.innerWidth;
+      const height = window.innerHeight * (isMobile ? 1.15 : 1); // Adjust height factor for mobile
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
     }
 
     // Initial setup and event listener
-    resizeRenderer(); // Initial size
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(resizeRenderer, 100);
-    });
+    handleResize(); // Initial size
+    window.addEventListener('resize', handleResize);
 
     // --- Animation Loop ---
     const clock = new THREE.Clock();
@@ -291,25 +292,38 @@ custom_html: full-screen
     });
 
     // --- Cleanup --- 
-    window.addEventListener('beforeunload', () => {
-      renderer.setAnimationLoop(null);
-      tori.forEach(torus => {
-        torus.geometry.dispose();
-        torus.material.dispose();
+    function cleanupResources() {
+      if (renderer) renderer.setAnimationLoop(null);
+      
+      scene.traverse(obj => {
+        if (obj.isMesh) {
+          if (obj.geometry) obj.geometry.dispose();
+          if (obj.material) {
+            if (obj.material.map) obj.material.map.dispose();
+            if (obj.material.envMap) obj.material.envMap.dispose();
+            if (obj.material.uniforms) {
+              Object.values(obj.material.uniforms).forEach(uniform => {
+                if (uniform.value?.dispose) uniform.value.dispose();
+              });
+            }
+            obj.material.dispose();
+          }
+        }
       });
-      if (stars) { // Dispose stars if they exist
-        stars.geometry.dispose();
-        stars.material.dispose();
+
+      if (renderer) {
+        renderer.dispose();
+        renderer.forceContextLoss();
       }
-      renderer.dispose();
-      // Dispose lights if needed
-      ambientLight.dispose();
-      directionalLight.dispose();
-      // Dispose scene and camera
-      scene.remove(mazeGroup);
-      mazeGroup.dispose();
-      camera.dispose();
-    });
+
+      THREE.Cache.clear();
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('beforeunload', cleanupResources);
+      window.removeEventListener('pagehide', cleanupResources);
+    }
+
+    window.addEventListener('beforeunload', cleanupResources);
+    window.addEventListener('pagehide', cleanupResources);
   </script>
 </div> <!-- Close threejs-container -->
 
