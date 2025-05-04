@@ -142,24 +142,28 @@ custom_html: full-screen
       uniform float u_time;
       uniform float u_mazeSpacing;
       uniform float u_ringBaseRadius;
+      uniform float u_gapAngle;
+      uniform bool u_isMobile;
 
       varying vec3 vWorldPosition;
 
       const float PI = 3.14159265359;
 
       void main() {
-        // Solid color without pattern
         vec3 color = u_mazeColor;
-
-        // Maze rotation and gaps
         float spin = mod(u_time * 0.15, 2.0 * PI);
         float theta = atan(vWorldPosition.y, vWorldPosition.x) - spin;
         float mazeSteps = 8.0 + floor(u_ringBaseRadius / u_mazeSpacing) * 2.0;
         float mazeAngle = 2.0 * PI / mazeSteps;
         float sector = mod(theta + PI, mazeAngle);
-        float gapAngle = mazeAngle * 0.3;
 
-        if (sector < gapAngle) discard;
+        if (u_isMobile) {
+          if (sector < u_gapAngle) discard;
+        } else {
+          float gapAngle = mazeAngle * 0.3;
+          if (sector < gapAngle) discard;
+        }
+
         gl_FragColor = vec4(color, 1.0);
       }
     `;
@@ -169,6 +173,8 @@ custom_html: full-screen
       u_time: { value: 0 },
       u_mazeColor: { value: MAZE_COLOR },
       u_mazeSpacing: { value: MAZE_SPACING },
+      u_gapAngle: { value: 0.0 }, // Initial value, will be updated later
+      u_isMobile: { value: isMobile },
     };
 
     // Create multiple tori
@@ -194,6 +200,14 @@ custom_html: full-screen
       mazeGroup.add(torus);
       tori.push(torus); // Store for cleanup and uniform updates
     }
+
+    // Calculate gap angle in JavaScript
+    const mazeSteps = 8.0 + Math.floor(sharedUniforms.u_ringBaseRadius.value / sharedUniforms.u_mazeSpacing.value) * 2.0;
+    const mazeAngle = 2.0 * Math.PI / mazeSteps;
+    const gapAngle = mazeAngle * 0.3;
+
+    // Update the uniform value
+    sharedUniforms.u_gapAngle.value = gapAngle;
 
     // --- Resize Handler ---
     let resizeTimeout;
