@@ -229,62 +229,14 @@ custom_html: full-screen
       renderer.render(scene, camera);
     }
 
-    let lastRenderTime = null; // Initialize lastRenderTime to null
-    function animateWithFPSLimit(time) {
-      // If lastRenderTime is null, animation is paused
-      if (lastRenderTime === null) {
-        return;
-      }
-      
-      const elapsedTime = clock.getElapsedTime();
-      const timeSinceLastRender = time - lastRenderTime;
-      if (timeSinceLastRender < 1000 / 30) {
-        requestAnimationFrame(animateWithFPSLimit);
-        return;
-      }
-      lastRenderTime = time;
-
-      // Update shared uniforms
-      sharedUniforms.u_time.value = elapsedTime;
-
-      // Optional: Rotate the whole maze group slowly if desired
-      mazeGroup.rotation.z = elapsedTime * 0.05;
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animateWithFPSLimit);
-    }
-
-    if (isMobile) {
-      lastRenderTime = 0; // Initialize lastRenderTime before calling animateWithFPSLimit
-      animateWithFPSLimit(0);
-    } else {
-      renderer.setAnimationLoop(animate);
-    }
+    renderer.setAnimationLoop(animate);
 
     // --- Page Visibility API to pause rendering when tab is inactive ---
-    let isPageVisible = true;
     document.addEventListener('visibilitychange', () => {
-      isPageVisible = document.visibilityState === 'visible';
-      if (isPageVisible) {
-        if (isMobile) {
-          // For mobile, restart the requestAnimationFrame loop
-          if (!lastRenderTime) {
-            lastRenderTime = 0;
-            animateWithFPSLimit(0);
-          }
-        } else {
-          // For desktop, use the Three.js animation loop
-          renderer.setAnimationLoop(animate);
-        }
+      if (document.visibilityState === 'visible') {
+        renderer.setAnimationLoop(animate);
       } else {
-        if (isMobile) {
-          // For mobile, we need a way to stop the requestAnimationFrame loop
-          // Setting lastRenderTime to null acts as a flag
-          lastRenderTime = null;
-        } else {
-          // For desktop, stop the Three.js animation loop
-          renderer.setAnimationLoop(null);
-        }
+        renderer.setAnimationLoop(null);
       }
     });
 
