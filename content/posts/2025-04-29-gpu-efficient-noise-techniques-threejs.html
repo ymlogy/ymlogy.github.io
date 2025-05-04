@@ -129,24 +129,21 @@ custom_html: full-screen
 
     const vertexShader = `
       varying vec3 vWorldPosition;
-      varying vec2 vUv;
       void main() {
         vec4 worldPosition = modelMatrix * vec4(position, 1.0);
         vWorldPosition = worldPosition.xyz;
-        vUv = uv; // Pass UVs for potential texture use later
         gl_Position = projectionMatrix * viewMatrix * worldPosition;
       }
     `;
 
     const fragmentShader = `
       precision mediump float;
-      uniform float u_time;
       uniform vec3 u_mazeColor;
+      uniform float u_time;
       uniform float u_mazeSpacing;
       uniform float u_ringBaseRadius;
 
       varying vec3 vWorldPosition;
-      varying vec2 vUv;
 
       const float PI = 3.14159265359;
 
