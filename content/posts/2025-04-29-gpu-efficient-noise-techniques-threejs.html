@@ -67,8 +67,7 @@ custom_html: full-screen
         powerPreference: 'high-performance'
     });
     renderer.setClearColor(BG_COLOR, 1);
-    renderer.setPixelRatio(isMobile ? 1.0 : window.devicePixelRatio);
-    // container.appendChild(renderer.domElement); // REMOVE: Renderer is attached via constructor
+    renderer.setPixelRatio(isMobile ? Math.min(window.devicePixelRatio * 0.6, 1.0) : Math.min(window.devicePixelRatio, 2.0));
 
     // Scene
     const scene = new THREE.Scene();
@@ -93,7 +92,7 @@ custom_html: full-screen
     // --- Starfield --- 
     let stars;
     function createStarfield() {
-      const starCount = 5000;
+      const starCount = isMobile ? 1000 : 5000; // Reduced particle count for mobile devices
       const starSpread = 50; // How far out the stars spread
       const vertices = [];
       for (let i = 0; i < starCount; i++) {
@@ -165,8 +164,10 @@ custom_html: full-screen
         float mazeSteps = 8.0 + floor(u_ringBaseRadius / u_mazeSpacing) * 2.0;
         float mazeAngle = 2.0 * PI / mazeSteps;
         float sector = mod(theta + PI, mazeAngle);
-        // Dynamic gap size based on radius and time
-        float gap = 0.3 + 0.18 * sin(floor(u_ringBaseRadius / u_mazeSpacing) * 2.3 + u_time * 0.4);
+        // Dynamic gap size based on radius and time - simplified calculation
+        float timeOffset = u_time * 0.4;
+        float ringIndex = floor(u_ringBaseRadius / u_mazeSpacing);
+        float gap = 0.3 + 0.18 * sin(ringIndex * 2.3 + timeOffset);
         float gapAngle = mazeAngle * gap;
 
         // Discard fragments that fall into the calculated gap
@@ -186,7 +187,7 @@ custom_html: full-screen
       // Skip ring 0 (center point)
       if (ringRadius <= 0.0) continue;
 
-      const geometry = new THREE.TorusGeometry(ringRadius, RING_THICKNESS, 16, 100); // Adjust segments as needed
+      const geometry = new THREE.TorusGeometry(ringRadius, RING_THICKNESS, isMobile ? 8 : 16, isMobile ? 50 : 100); // Adjust segments as needed
 
       // Each torus needs its own material instance ONLY IF uniforms differ per torus
       // Here, u_ringBaseRadius differs, so we need separate materials.
@@ -225,12 +226,9 @@ custom_html: full-screen
     });
 
     // --- Animation Loop ---
-    let animationId;
     const clock = new THREE.Clock();
 
-    function animate() {
-      animationId = requestAnimationFrame(animate);
-
+    function animate(time) {
       const elapsedTime = clock.getElapsedTime();
 
       // Update time uniform for all torus materials
@@ -243,11 +241,63 @@ custom_html: full-screen
 
       renderer.render(scene, camera);
     }
-    animate();
+
+    function animateWithFPSLimit(time) {
+      const elapsedTime = clock.getElapsedTime();
+
+      // Update time uniform for all torus materials
+      tori.forEach(torus => {
+          torus.material.uniforms.u_time.value = elapsedTime;
+      });
+
+      // Optional: Rotate the whole maze group slowly if desired
+      // mazeGroup.rotation.z = elapsedTime * 0.05;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animateWithFPSLimit);
+    }
+
+    if (isMobile) {
+      let lastRenderTime = 0;
+      function animateWithFPSLimit(time) {
+        const elapsedTime = clock.getElapsedTime();
+        const timeSinceLastRender = time - lastRenderTime;
+        if (timeSinceLastRender < 1000 / 30) {
+          requestAnimationFrame(animateWithFPSLimit);
+          return;
+        }
+        lastRenderTime = time;
+
+        // Update time uniform for all torus materials
+        tori.forEach(torus => {
+          torus.material.uniforms.u_time.value = elapsedTime;
+        });
+
+        // Optional: Rotate the whole maze group slowly if desired
+        // mazeGroup.rotation.z = elapsedTime * 0.05;
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(animateWithFPSLimit);
+      }
+      animateWithFPSLimit();
+    } else {
+      renderer.setAnimationLoop(animate);
+    }
+
+    // --- Page Visibility API to pause rendering when tab is inactive ---
+    let isPageVisible = true;
+    document.addEventListener('visibilitychange', () => {
+      isPageVisible = document.visibilityState === 'visible';
+      if (isPageVisible) {
+        renderer.setAnimationLoop(animate);
+      } else {
+        renderer.setAnimationLoop(null);
+      }
+    });
 
     // --- Cleanup --- 
     window.addEventListener('beforeunload', () => {
-      cancelAnimationFrame(animationId);
+      renderer.setAnimationLoop(null);
       tori.forEach(torus => {
         torus.geometry.dispose();
         torus.material.dispose();
