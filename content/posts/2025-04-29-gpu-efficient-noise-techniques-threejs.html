@@ -143,7 +143,7 @@ custom_html: full-screen
       uniform float u_time;
       uniform vec3 u_mazeColor;
       uniform float u_mazeSpacing;
-      uniform float u_ringBaseRadius; // Base radius of this specific torus
+      uniform float u_ringBaseRadius;
 
       varying vec3 vWorldPosition;
       varying vec2 vUv;
@@ -151,32 +151,28 @@ custom_html: full-screen
       const float PI = 3.14159265359;
 
       void main() {
-        // Calculate polar coordinates in XY plane from world position
-        float r = length(vWorldPosition.xy); // Distance from center in XY plane
-        float theta = atan(vWorldPosition.y, vWorldPosition.x);
+        // Calculate polar coordinates with rotation
+        float spin = mod(u_time * 0.15, 2.0 * PI); // Slow rotation
+        float theta = atan(vWorldPosition.y, vWorldPosition.x) - spin;
+        
+        // Checkerboard pattern (rotates with maze)
+        float checkerSize = u_mazeSpacing * 0.5;
+        float x = floor(vWorldPosition.x / checkerSize);
+        float y = floor(vWorldPosition.y / checkerSize);
+        float checker = mod(x + y, 2.0);
+        vec3 color = mix(u_mazeColor, u_mazeColor * 1.2, checker);
 
-        // Spin: rotate pattern over time - use modulo to prevent time accumulation
-        float spin = mod(u_time * 0.15, 2.0 * PI); // slow clockwise, capped at 2π
-        theta -= spin;
-
-        // Maze gap logic (adapted from 2D version)
-        // Note: u_ringBaseRadius helps determine steps for *this* ring
+        // Maze gap calculation
         float mazeSteps = 8.0 + floor(u_ringBaseRadius / u_mazeSpacing) * 2.0;
         float mazeAngle = 2.0 * PI / mazeSteps;
         float sector = mod(theta + PI, mazeAngle);
-        // Dynamic gap size based on radius and time - simplified calculation
-        float timeOffset = mod(u_time * 0.4, 2.0 * PI); // Prevent time accumulation
-        float ringIndex = floor(u_ringBaseRadius / u_mazeSpacing);
-        float gap = 0.3 + 0.18 * sin(ringIndex * 2.3 + timeOffset);
-        float gapAngle = mazeAngle * gap;
+        float gapAngle = mazeAngle * 0.3;
 
-        // Discard fragments that fall into the calculated gap
         if (sector < gapAngle) {
           discard;
         }
 
-        // Color output for visible parts
-        gl_FragColor = vec4(u_mazeColor, 1.0);
+        gl_FragColor = vec4(color, 1.0);
       }
     `;
 
@@ -240,7 +236,7 @@ custom_html: full-screen
       sharedUniforms.u_time.value = timeUniform.value;
 
       // Optional: Rotate the whole maze group slowly if desired
-      // mazeGroup.rotation.z = elapsedTime * 0.05;
+      mazeGroup.rotation.z = timeUniform.value * 0.05;
 
       renderer.render(scene, camera);
     }
@@ -264,7 +260,7 @@ custom_html: full-screen
       sharedUniforms.u_time.value = elapsedTime;
 
       // Optional: Rotate the whole maze group slowly if desired
-      // mazeGroup.rotation.z = elapsedTime * 0.05;
+      mazeGroup.rotation.z = elapsedTime * 0.05;
 
       renderer.render(scene, camera);
       requestAnimationFrame(animateWithFPSLimit);
