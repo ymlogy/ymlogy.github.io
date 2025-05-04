@@ -155,8 +155,8 @@ custom_html: full-screen
         float r = length(vWorldPosition.xy); // Distance from center in XY plane
         float theta = atan(vWorldPosition.y, vWorldPosition.x);
 
-        // Spin: rotate pattern over time
-        float spin = u_time * 0.15; // slow clockwise
+        // Spin: rotate pattern over time - use modulo to prevent time accumulation
+        float spin = mod(u_time * 0.15, 2.0 * PI); // slow clockwise, capped at 2π
         theta -= spin;
 
         // Maze gap logic (adapted from 2D version)
@@ -165,7 +165,7 @@ custom_html: full-screen
         float mazeAngle = 2.0 * PI / mazeSteps;
         float sector = mod(theta + PI, mazeAngle);
         // Dynamic gap size based on radius and time - simplified calculation
-        float timeOffset = u_time * 0.4;
+        float timeOffset = mod(u_time * 0.4, 2.0 * PI); // Prevent time accumulation
         float ringIndex = floor(u_ringBaseRadius / u_mazeSpacing);
         float gap = 0.3 + 0.18 * sin(ringIndex * 2.3 + timeOffset);
         float gapAngle = mazeAngle * gap;
@@ -180,6 +180,13 @@ custom_html: full-screen
       }
     `;
 
+    // Create shared uniforms
+    const sharedUniforms = {
+      u_time: { value: 0 },
+      u_mazeColor: { value: MAZE_COLOR },
+      u_mazeSpacing: { value: MAZE_SPACING },
+    };
+
     // Create multiple tori
     const tori = [];
     for (let i = 0; i < NUM_RINGS; i++) {
@@ -189,18 +196,15 @@ custom_html: full-screen
 
       const geometry = new THREE.TorusGeometry(ringRadius, RING_THICKNESS, isMobile ? 8 : 16, isMobile ? 50 : 100); // Adjust segments as needed
 
-      // Each torus needs its own material instance ONLY IF uniforms differ per torus
-      // Here, u_ringBaseRadius differs, so we need separate materials.
+      // Create material with shared uniforms and unique ringBaseRadius
       const material = new THREE.ShaderMaterial({
-          uniforms: {
-              u_time: { value: 0 },
-              u_mazeColor: { value: MAZE_COLOR },
-              u_mazeSpacing: { value: MAZE_SPACING },
-              u_ringBaseRadius: { value: ringRadius } // Pass the base radius
-          },
-          vertexShader,
-          fragmentShader,
-          // side: THREE.DoubleSide // Optional: Render backfaces if needed
+        uniforms: {
+          ...sharedUniforms,
+          u_ringBaseRadius: { value: ringRadius } // Pass the base radius
+        },
+        vertexShader,
+        fragmentShader,
+        // side: THREE.DoubleSide // Optional: Render backfaces if needed
       });
 
       const torus = new THREE.Mesh(geometry, material);
@@ -227,14 +231,13 @@ custom_html: full-screen
 
     // --- Animation Loop ---
     const clock = new THREE.Clock();
+    let timeUniform = { value: 0 };
 
     function animate(time) {
-      const elapsedTime = clock.getElapsedTime();
+      timeUniform.value = clock.getElapsedTime();
 
-      // Update time uniform for all torus materials
-      tori.forEach(torus => {
-          torus.material.uniforms.u_time.value = elapsedTime;
-      });
+      // Update shared uniforms
+      sharedUniforms.u_time.value = timeUniform.value;
 
       // Optional: Rotate the whole maze group slowly if desired
       // mazeGroup.rotation.z = elapsedTime * 0.05;
@@ -257,10 +260,8 @@ custom_html: full-screen
       }
       lastRenderTime = time;
 
-      // Update time uniform for all torus materials
-      tori.forEach(torus => {
-          torus.material.uniforms.u_time.value = elapsedTime;
-      });
+      // Update shared uniforms
+      sharedUniforms.u_time.value = elapsedTime;
 
       // Optional: Rotate the whole maze group slowly if desired
       // mazeGroup.rotation.z = elapsedTime * 0.05;
@@ -317,6 +318,10 @@ custom_html: full-screen
       // Dispose lights if needed
       ambientLight.dispose();
       directionalLight.dispose();
+      // Dispose scene and camera
+      scene.remove(mazeGroup);
+      mazeGroup.dispose();
+      camera.dispose();
     });
   </script>
 </div> <!-- Close threejs-container -->
