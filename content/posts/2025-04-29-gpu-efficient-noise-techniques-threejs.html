@@ -151,27 +151,18 @@ custom_html: full-screen
       const float PI = 3.14159265359;
 
       void main() {
-        // Calculate polar coordinates with rotation
-        float spin = mod(u_time * 0.15, 2.0 * PI); // Slow rotation
-        float theta = atan(vWorldPosition.y, vWorldPosition.x) - spin;
-        
-        // Checkerboard pattern (rotates with maze)
-        float checkerSize = u_mazeSpacing * 0.5;
-        float x = floor(vWorldPosition.x / checkerSize);
-        float y = floor(vWorldPosition.y / checkerSize);
-        float checker = mod(x + y, 2.0);
-        vec3 color = mix(u_mazeColor, u_mazeColor * 1.2, checker);
+        // Solid color without pattern
+        vec3 color = u_mazeColor;
 
-        // Maze gap calculation
+        // Maze rotation and gaps
+        float spin = mod(u_time * 0.15, 2.0 * PI);
+        float theta = atan(vWorldPosition.y, vWorldPosition.x) - spin;
         float mazeSteps = 8.0 + floor(u_ringBaseRadius / u_mazeSpacing) * 2.0;
         float mazeAngle = 2.0 * PI / mazeSteps;
         float sector = mod(theta + PI, mazeAngle);
         float gapAngle = mazeAngle * 0.3;
 
-        if (sector < gapAngle) {
-          discard;
-        }
-
+        if (sector < gapAngle) discard;
         gl_FragColor = vec4(color, 1.0);
       }
     `;
@@ -196,11 +187,10 @@ custom_html: full-screen
       const material = new THREE.ShaderMaterial({
         uniforms: {
           ...sharedUniforms,
-          u_ringBaseRadius: { value: ringRadius } // Pass the base radius
+          u_ringBaseRadius: { value: ringRadius }, // Pass the base radius
         },
         vertexShader,
-        fragmentShader,
-        // side: THREE.DoubleSide // Optional: Render backfaces if needed
+        fragmentShader
       });
 
       const torus = new THREE.Mesh(geometry, material);
