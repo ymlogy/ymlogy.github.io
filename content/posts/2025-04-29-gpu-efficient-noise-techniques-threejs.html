@@ -245,7 +245,7 @@ custom_html: full-screen
       renderer.render(scene, camera);
     }
 
-    let lastRenderTime = 0;
+    let lastRenderTime = null; // Initialize lastRenderTime to null
     function animateWithFPSLimit(time) {
       // If lastRenderTime is null, animation is paused
       if (lastRenderTime === null) {
@@ -271,6 +271,7 @@ custom_html: full-screen
     }
 
     if (isMobile) {
+      lastRenderTime = 0; // Initialize lastRenderTime before calling animateWithFPSLimit
       animateWithFPSLimit(0);
     } else {
       renderer.setAnimationLoop(animate);
