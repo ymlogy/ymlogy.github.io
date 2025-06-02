@@ -1,4 +1,11 @@
-**Unlocking the Power of Meta-Prompting with LLMs**
+---
+title: "Unlocking the Power of Meta-Prompting with LLMs"
+date: 2025-06-01
+draft: false
+description: "A practical introduction and guide to meta-prompting techniques for large language models, including orchestrating specialist LLMs."
+tags: [meta-prompting, prompt engineering, LLM, AI, research]
+categories: [AI, prompt engineering]
+---
 
 If you’re working with large language models (LLMs) for research, writing, or problem-solving, you’ve probably heard about “meta-prompting.” But what is it, and how can you use it to get better results from your AI assistant? Let’s break it down.
 
