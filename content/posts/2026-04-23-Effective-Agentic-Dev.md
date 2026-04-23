@@ -1,4 +1,11 @@
-<img src="https://r2cdn.perplexity.ai/pplx-full-logo-primary-dark%402x.png" style="height:64px;margin-right:32px"/>
+---
+title: "Effective AI Agentic Software Development: Repo and Context Conventions"
+date: 2026-04-23
+draft: false
+description: "A short reference guide for agentic coding good practices"
+tags: ["coding", "dev", "LLMs", "web development"]
+categories: ["guides"]
+---
 
 # Effective AI Agentic Software Development: Repo and Context Conventions
 
