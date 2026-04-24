@@ -66,11 +66,3 @@ Don't overwhelm SWE-1.6 with the entire architectural history of your company. G
 
 ## Conclusion
 The combination of Claude Opus and SWE-1.6 represents the shift from **AI Chat** to **AI Agency**. By separating the "thinking" from the "doing," developers can build faster, more reliable systems while maintaining the high architectural standards required for professional software engineering.
-"""
-
-# Create the markdown file
-file_path = "opus_swe_execution_strategy.md"
-with open(file_path, "w") as f:
-    f.write(blog_content)
-
-print(f"File created at: {file_path}")
