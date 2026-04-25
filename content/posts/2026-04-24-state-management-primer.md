@@ -6,8 +6,6 @@ tags: ["State Management", "Svelte", "React", "Web Development"]
 categories: ["Development"]
 ---
 
-# State Management Primer: The Architecture of Application Memory
-
 In the golden age of the web, "state" was a simple conversation between a server and a form. Today, web applications are living, breathing entities. They need to remember where you scrolled, what you’re typing, and if your notifications are screaming for attention—all without a single page refresh.
 
 Managing this "collective memory" is **State Management**. It’s the difference between a fluid experience and a digital nervous breakdown.
