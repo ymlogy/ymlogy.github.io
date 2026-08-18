@@ -65,7 +65,7 @@ Apple's Intelligent Tracking Prevention evicts IndexedDB for non-installed sites
 
 The only exemption is installation. When a user does Share → Add to Home Screen, the installed PWA gets its own storage partition tied to the home-screen icon, and that partition is exempt from the seven-day eviction. Installation is not just about having a nice icon on the home screen. On iOS, it is the thing that makes local storage durable. Without it, you've built a toy.
 
-This has implications for how you document the app. "Install for the best experience" is the usual PWA phrasing. For an app that stores user data locally on iOS, the honest phrasing is closer to "install, or your data will be deleted in a week." That's not a marketing line anyone wants to write, but it's the truth of the platform.
+This has implications for how you document the app. "Install for the best experience" is the usual PWA phrasing. For an app that stores user data locally on iOS, the real phrasing is closer to "install, or your data will be deleted in a week." That's not a marketing line anyone wants to write, but it's the truth of the platform.
 
 A few more iOS details worth knowing:
 
@@ -86,7 +86,7 @@ Brave, despite being Chromium-based, does not create WebAPKs. There's an open is
 
 Firefox on Android is a different shape again. It doesn't create true standalone PWAs. A Mozilla engineer put it bluntly in a Bugzilla comment: "Firefox doesn't have true PWAs. It installs a bookmark with 'single-site browsing', but it's still just a browser tab." Firefox does support `navigator.storage.persist()` on Android, but unlike Chrome it prompts the user with a permission dialog rather than auto-granting. If the user dismisses it, storage stays best-effort. And because the "installed" app is really just a browser tab with a shortcut, clearing Firefox's site data wipes the PWA's IndexedDB along with everything else.
 
-The practical upshot: on Android, **Chrome is the browser you want users to install from.** The WebAPK mechanism gives the PWA real operating-system integration and the strongest storage protection. Brave and Firefox will technically work, but the install is shallower, the storage is more tightly coupled to the browser's own data lifecycle, and the failure modes when the browser updates or clears data are more likely to take the flash inventory with them. If you're writing install instructions for an Android user, "use Chrome" is the honest recommendation, not just a preference.
+The practical upshot: on Android, **Chrome is the browser you want users to install from.** The WebAPK mechanism gives the PWA real operating-system integration and the strongest storage protection. Brave and Firefox will technically work, but the install is shallower, the storage is more tightly coupled to the browser's own data lifecycle, and the failure modes when the browser updates or clears data are more likely to take the flash inventory with them. If you're writing install instructions for an Android user, "use Chrome" is the recommendation worth making, not just a preference.
 
 Samsung Internet and Edge on Android are both Chromium-based and do create WebAPKs, so they're fine too. The problem is specifically Brave and Firefox.
 
@@ -101,7 +101,7 @@ Here's what I ended up with, for a local-storage PWA that needs to survive on a 
 5. **Per-file precache, not `addAll`.** A missing icon shouldn't block the shell.
 6. **A cache-name stamp derived from a hash of the shell.** So a deployed change is never served from a stale cache. Enforced in CI.
 7. **HTTPS.** Required for the service worker, and `persist()` is a no-op on insecure contexts.
-8. **Document the install step honestly**, especially on iOS. The data doesn't survive without it.
+8. **Tell users to install the app**, especially on iOS. The data doesn't survive without it.
 
 None of this is hard individually. The problem is that it's six separate things, each with a failure mode that's silent and delayed, and the platform documentation doesn't assemble them for you. The PWA tutorials mostly stop at "add a manifest and a service worker" and leave the persistence story as an exercise. The IndexedDB tutorials don't mention eviction. The eviction docs don't mention that installation exempts you from it. The `persist()` docs don't mention it's a no-op on iOS.
 
