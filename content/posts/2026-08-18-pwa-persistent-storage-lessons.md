@@ -11,7 +11,7 @@ categories: ["development", "web"]
 
 ---
 
-I built a small flash exposure calculator. The math is simple: guide number divided by aperture gives you distance, adjusted for ISO and power. Photographists have been doing it in their heads since the 1950s. The app exists because doing it in your head while also metering a scene and loading a film back is a lot, and a phone is already in your pocket anyway. You can try it here: [FlashCalc](https://robby3000.github.io/FlashCalc).
+I built a small flash exposure calculator. The math is simple: guide number divided by aperture gives you distance, adjusted for ISO and power. Photographers have been doing it in their heads since the 1950s. The app exists because doing it in your head while also metering a scene and loading a film back is a lot, and a phone is already in your pocket anyway. You can try it here: [FlashCalc](https://robby3000.github.io/FlashCalc).
 
 The interesting part wasn't the calculator. It was making the thing into a PWA that stores a user's flash inventory locally and doesn't lose it. That turned out to be a stack of five or six separate requirements, most of which are not obvious, and at least one of which is entirely outside the developer's control.
 
