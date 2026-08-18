@@ -13,7 +13,7 @@ categories: ["development", "web"]
 
 I built a small flash exposure calculator. The math is simple: guide number divided by aperture gives you distance, adjusted for ISO and power. Photographists have been doing it in their heads since the 1950s. The app exists because doing it in your head while also metering a scene and loading a film back is a lot, and a phone is already in your pocket anyway. You can try it here: [FlashCalc](https://robby3000.github.io/FlashCalc).
 
-The interesting part wasn't the calculator. It was making the thing into a PWA that stores a user's flash library locally and doesn't lose it. That turned out to be a stack of five or six separate requirements, most of which are not obvious, and at least one of which is entirely outside the developer's control.
+The interesting part wasn't the calculator. It was making the thing into a PWA that stores a user's flash inventory locally and doesn't lose it. That turned out to be a stack of five or six separate requirements, most of which are not obvious, and at least one of which is entirely outside the developer's control.
 
 Here's what I learned, in roughly the order it bit me.
 
@@ -21,11 +21,11 @@ Here's what I learned, in roughly the order it bit me.
 
 This is the easy one, but it's worth being precise about why.
 
-localStorage is synchronous, capped around 5 MB, and on mobile browsers it's the first thing evicted when storage pressure hits. It's fine for a "last selected tab" preference. It is not fine for anything the user would be upset to lose. A flash library, even a small one, is exactly that. Someone who has typed in the guide numbers for three or four flashes, including a zoom head with eight steps, will not be charmed to find the list empty one morning.
+localStorage is synchronous, capped around 5 MB, and on mobile browsers it's the first thing evicted when storage pressure hits. It's fine for a "last selected tab" preference. It is not fine for anything the user would be upset to lose. A flash inventory, even a small one, is exactly that. Someone who has typed in the guide numbers for three or four flashes, including a zoom head with eight steps, will not be charmed to find the list empty one morning.
 
 IndexedDB is asynchronous, has a much larger quota (often several gigabytes on installed PWAs), and is treated as more durable by the browser's eviction logic. It's also more awkward to use. The raw API is callback-based and verbose. The temptation is to reach for Dexie.js, which wraps it in something pleasant. For a project with three or four stores and complex queries, that's reasonable. For a single object store holding a flat list of records, it's a 60-line wrapper and Dexie is overkill. The vanilla API is not that bad once you write `openDB`, `getAll`, `put`, and `delete` once each.
 
-The split I ended up with: IndexedDB for the flash library (the thing that matters), localStorage for prefs like the last-selected flash, last ISO, and the metres/feet toggle (things where losing them is a minor annoyance, not a data-loss event).
+The split I ended up with: IndexedDB for the flash inventory (the thing that matters), localStorage for prefs like the last-selected flash, last ISO, and the metres/feet toggle (things where losing them is a minor annoyance, not a data-loss event).
 
 ## The service worker is not just for offline
 
@@ -74,11 +74,21 @@ A few more iOS details worth knowing:
 - "Clear History and Website Data" in iOS Settings wipes installed PWAs too. No protection against this.
 - Even installed, iOS will evict after "many weeks" of non-use. Apple hasn't documented the exact threshold. Launching periodically is the only mitigation.
 
-## Android: install plus persist
+## Android: install plus persist, but the browser matters
 
 Android Chrome's eviction logic is gentler. Installed PWAs are prioritised and rarely evicted, but disk pressure can still trigger it. The `navigator.storage.persist()` call upgrades the origin from best-effort to persistent, which the browser won't touch without explicit user action. So on Android you have two levers: installation (the user's action) and the persist request (your code). Use both.
 
 The persist call should happen after the database opens, and some browsers refuse it before a user gesture, so it's worth retrying once on the first `pointerdown`. Wrapped in feature detection, it's a silent no-op on iOS and older browsers, harmless to call everywhere.
+
+But there's a catch I didn't know about until I started testing on other Android browsers: **not all Android browsers install PWAs the same way.** Chrome does something the others don't. When you install a PWA in Chrome on Android, it generates a **WebAPK** - an actual Android application package. The PWA shows up in the app drawer, appears in Android's Settings app alongside native apps, can register intent filters to handle URLs, and runs as a first-class Android app. The storage is still shared with Chrome's profile, but Chrome treats installed PWAs as high-priority and auto-grants the `persist()` request without prompting the user.
+
+Brave, despite being Chromium-based, does not create WebAPKs. There's an open issue in the Brave repo (#56133) documenting this: installing a PWA in Brave on Android creates a home screen shortcut that opens inside the Brave browser, not a standalone app. The address bar may or may not hide depending on your manifest, but the PWA runs as part of the browser process - closing Brave closes the PWA. A separate issue (#53694) reports that Brave updates can silently remove installed PWAs entirely, forcing users to reinstall. If the shortcut is removed, the connection to the storage is severed, and the next time the user finds the app it may well start empty.
+
+Firefox on Android is a different shape again. It doesn't create true standalone PWAs. A Mozilla engineer put it bluntly in a Bugzilla comment: "Firefox doesn't have true PWAs. It installs a bookmark with 'single-site browsing', but it's still just a browser tab." Firefox does support `navigator.storage.persist()` on Android, but unlike Chrome it prompts the user with a permission dialog rather than auto-granting. If the user dismisses it, storage stays best-effort. And because the "installed" app is really just a browser tab with a shortcut, clearing Firefox's site data wipes the PWA's IndexedDB along with everything else.
+
+The practical upshot: on Android, **Chrome is the browser you want users to install from.** The WebAPK mechanism gives the PWA real operating-system integration and the strongest storage protection. Brave and Firefox will technically work, but the install is shallower, the storage is more tightly coupled to the browser's own data lifecycle, and the failure modes when the browser updates or clears data are more likely to take the flash inventory with them. If you're writing install instructions for an Android user, "use Chrome" is the honest recommendation, not just a preference.
+
+Samsung Internet and Edge on Android are both Chromium-based and do create WebAPKs, so they're fine too. The problem is specifically Brave and Firefox.
 
 ## The full checklist
 
